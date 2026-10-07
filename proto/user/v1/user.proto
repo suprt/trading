@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package user.v1;
+
+option go_package="github.com/suprt/ITK-proj/pkg/proto/user/v1;user_v1";
+import "google/protobuf/timestamp.proto";
+
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_USER = 1;
+  ROLE_TRADER = 2;
+  ROLE_ADMIN = 3;
+}
+
+service UserService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc GrantRole(GrantRoleRequest) returns (GrantRoleResponse);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  repeated Role roles = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message RegisterRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResponse{
+  string user_id = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  string user_id = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message RefreshTokenRequest{
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse{
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message GetUserRequest{
+  string user_id = 1;
+}
+
+message GetUserResponse{
+  User user = 1;
+}
+
+message LogoutRequest{
+  string refresh_token = 1;
+}
+
+message LogoutResponse{
+}
+
+message GrantRoleRequest{
+  string user_id = 1;
+  Role role = 2;
+}
+
+message GrantRoleResponse{
+
+}
