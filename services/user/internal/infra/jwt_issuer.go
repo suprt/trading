@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/suprt/ITK-proj/services/user/internal/domain"
+	"github.com/suprt/trading/services/user/internal/domain"
 )
 
 type JWTConfig struct {

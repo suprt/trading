@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"github.com/suprt/ITK-proj/pkg/config"
+	"github.com/suprt/trading/pkg/config"
 	"go.uber.org/fx"
 )
 

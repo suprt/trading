@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/suprt/ITK-proj/pkg/proto/user/v1"
-	"github.com/suprt/ITK-proj/services/user/internal/domain"
+	"github.com/suprt/trading/pkg/proto/user/v1"
+	"github.com/suprt/trading/services/user/internal/domain"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

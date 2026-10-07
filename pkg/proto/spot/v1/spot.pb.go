@@ -24,7 +24,7 @@ var File_spot_v1_spot_proto protoreflect.FileDescriptor
 
 const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
-	"\x12spot/v1/spot.protoB:B\tSpotProtoP\x01Z+github.com/suprt/ITK-proj/pkg/proto/spot/v1"
+	"\x12spot/v1/spot.protoB9B\tSpotProtoP\x01Z*github.com/suprt/trading/pkg/proto/spot/v1"
 
 var file_spot_v1_spot_proto_goTypes = []any{}
 var file_spot_v1_spot_proto_depIdxs = []int32{

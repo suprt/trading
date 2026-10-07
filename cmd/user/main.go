@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/suprt/ITK-proj/pkg/bootstrap"
-	"github.com/suprt/ITK-proj/pkg/config"
-	"github.com/suprt/ITK-proj/services/user"
+	"github.com/suprt/trading/pkg/bootstrap"
+	"github.com/suprt/trading/pkg/config"
+	"github.com/suprt/trading/services/user"
 	"go.uber.org/fx"
 )
 

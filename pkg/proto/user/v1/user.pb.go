@@ -771,8 +771,8 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\fRefreshToken\x12\x1c.user.v1.RefreshTokenRequest\x1a\x1d.user.v1.RefreshTokenResponse\x12<\n" +
 	"\aGetUser\x12\x17.user.v1.GetUserRequest\x1a\x18.user.v1.GetUserResponse\x129\n" +
 	"\x06Logout\x12\x16.user.v1.LogoutRequest\x1a\x17.user.v1.LogoutResponse\x12B\n" +
-	"\tGrantRole\x12\x19.user.v1.GrantRoleRequest\x1a\x1a.user.v1.GrantRoleResponseB\x89\x01\n" +
-	"\vcom.user.v1B\tUserProtoP\x01Z2github.com/suprt/ITK-proj/pkg/proto/user/v1;userv1\xa2\x02\x03UXX\xaa\x02\aUser.V1\xca\x02\aUser\\V1\xe2\x02\x13User\\V1\\GPBMetadata\xea\x02\bUser::V1b\x06proto3"
+	"\tGrantRole\x12\x19.user.v1.GrantRoleRequest\x1a\x1a.user.v1.GrantRoleResponseB\x88\x01\n" +
+	"\vcom.user.v1B\tUserProtoP\x01Z1github.com/suprt/trading/pkg/proto/user/v1;userv1\xa2\x02\x03UXX\xaa\x02\aUser.V1\xca\x02\aUser\\V1\xe2\x02\x13User\\V1\\GPBMetadata\xea\x02\bUser::V1b\x06proto3"
 
 var (
 	file_user_v1_user_proto_rawDescOnce sync.Once

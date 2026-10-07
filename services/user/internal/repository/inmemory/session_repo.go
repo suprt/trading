@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/suprt/ITK-proj/services/user/internal/domain"
+	"github.com/suprt/trading/services/user/internal/domain"
 )
 
 type SessionRepo struct {

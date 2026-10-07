@@ -6,7 +6,7 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/suprt/ITK-proj/pkg/proto
+      value: github.com/suprt/trading/pkg/proto
 plugins:
   - remote: buf.build/protocolbuffers/go
     out: ../pkg/proto

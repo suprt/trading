@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
-	"github.com/suprt/ITK-proj/pkg/config"
+	"github.com/suprt/trading/pkg/config"
 )
 
 type Params struct {

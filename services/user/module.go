@@ -1,12 +1,12 @@
 package user
 
 import (
-	"github.com/suprt/ITK-proj/pkg/config"
-	userv1 "github.com/suprt/ITK-proj/pkg/proto/user/v1"
-	"github.com/suprt/ITK-proj/services/user/internal/handler"
-	"github.com/suprt/ITK-proj/services/user/internal/infra"
-	"github.com/suprt/ITK-proj/services/user/internal/repository/inmemory"
-	"github.com/suprt/ITK-proj/services/user/internal/service"
+	"github.com/suprt/trading/pkg/config"
+	userv1 "github.com/suprt/trading/pkg/proto/user/v1"
+	"github.com/suprt/trading/services/user/internal/handler"
+	"github.com/suprt/trading/services/user/internal/infra"
+	"github.com/suprt/trading/services/user/internal/repository/inmemory"
+	"github.com/suprt/trading/services/user/internal/service"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"

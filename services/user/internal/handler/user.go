@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	userv1 "github.com/suprt/ITK-proj/pkg/proto/user/v1"
-	"github.com/suprt/ITK-proj/services/user/internal/domain"
-	"github.com/suprt/ITK-proj/services/user/internal/service"
+	userv1 "github.com/suprt/trading/pkg/proto/user/v1"
+	"github.com/suprt/trading/services/user/internal/domain"
+	"github.com/suprt/trading/services/user/internal/service"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

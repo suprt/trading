@@ -24,8 +24,8 @@ var File_order_v1_order_proto protoreflect.FileDescriptor
 
 const file_order_v1_order_proto_rawDesc = "" +
 	"\n" +
-	"\x14order/v1/order.protoB<B\n" +
-	"OrderProtoP\x01Z,github.com/suprt/ITK-proj/pkg/proto/order/v1"
+	"\x14order/v1/order.protoB;B\n" +
+	"OrderProtoP\x01Z+github.com/suprt/trading/pkg/proto/order/v1"
 
 var file_order_v1_order_proto_goTypes = []any{}
 var file_order_v1_order_proto_depIdxs = []int32{

@@ -1,4 +1,4 @@
-module github.com/suprt/ITK-proj
+module github.com/suprt/trading
 
 go 1.27.1
 
