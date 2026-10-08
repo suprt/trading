@@ -6,16 +6,14 @@ import (
 
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
-
-	"github.com/suprt/trading/pkg/config"
 )
 
 type Params struct {
 	fx.In
-	LC  fx.Lifecycle
-	Cfg config.Config
+	LC   fx.Lifecycle
+	Addr Addr `name: "grpc_addr"`
 }
-
+type Addr string
 type Result struct {
 	fx.Out
 	Server *grpc.Server
@@ -26,7 +24,7 @@ func New(p Params) Result {
 
 	p.LC.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			lis, err := net.Listen("tcp", p.Cfg.GRPC.Addr)
+			lis, err := net.Listen("tcp", string(p.Addr))
 			if err != nil {
 				return err
 			}

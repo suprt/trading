@@ -1,8 +1,9 @@
 package user
 
 import (
-	"github.com/suprt/trading/pkg/config"
+	"github.com/suprt/trading/pkg/grpcServer"
 	userv1 "github.com/suprt/trading/pkg/proto/user/v1"
+	userconfig "github.com/suprt/trading/services/user/internal/config"
 	"github.com/suprt/trading/services/user/internal/handler"
 	"github.com/suprt/trading/services/user/internal/infra"
 	"github.com/suprt/trading/services/user/internal/repository/inmemory"
@@ -13,14 +14,22 @@ import (
 )
 
 var Module = fx.Module("user",
+	fx.Provide(func() userconfig.Config {
+		return userconfig.Default()
+	}),
+
 	fx.Provide(
-		func(cfg config.Config) infra.JWTConfig {
+		func(cfg userconfig.Config) grpcServer.Addr {
+			return grpcServer.Addr(cfg.GRPC.Addr)
+		},
+
+		func(cfg userconfig.Config) infra.JWTConfig {
 			return infra.JWTConfig{
 				Secret: cfg.JWT.Secret,
 				TTL:    cfg.JWT.AccessTTL,
 			}
 		},
-		func(cfg config.Config) service.RegisterConfig {
+		func(cfg userconfig.Config) service.RegisterConfig {
 			return service.RegisterConfig{
 				RefreshTTL: cfg.JWT.RefreshTTL,
 			}
