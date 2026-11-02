@@ -2,10 +2,10 @@
 CREATE TABLE markets (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
-    required_role TEXT[] NOT NULL DEFAULT '{}',
+    required_roles TEXT[] NOT NULL DEFAULT '{}',
     enabled BOOLEAN NOT NULL DEFAULT TRUE,
     deleted_at TIMESTAMPTZ,
-    create_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
