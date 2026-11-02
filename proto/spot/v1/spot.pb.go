@@ -4,12 +4,16 @@
 // 	protoc        (unknown)
 // source: spot/v1/spot.proto
 
-package v1
+package spotv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	v1 "github.com/suprt/trading/proto/user/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -20,19 +24,778 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Market struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	RequiredRoles []v1.Role              `protobuf:"varint,3,rep,packed,name=required_roles,json=requiredRoles,proto3,enum=user.v1.Role" json:"required_roles,omitempty"`
+	Enabled       bool                   `protobuf:"varint,4,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Market) Reset() {
+	*x = Market{}
+	mi := &file_spot_v1_spot_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Market) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Market) ProtoMessage() {}
+
+func (x *Market) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Market.ProtoReflect.Descriptor instead.
+func (*Market) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Market) GetMarketId() string {
+	if x != nil {
+		return x.MarketId
+	}
+	return ""
+}
+
+func (x *Market) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Market) GetRequiredRoles() []v1.Role {
+	if x != nil {
+		return x.RequiredRoles
+	}
+	return nil
+}
+
+func (x *Market) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *Market) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Market) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Market) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
+	}
+	return nil
+}
+
+type ViewMarketRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserRoles     []v1.Role              `protobuf:"varint,1,rep,packed,name=user_roles,json=userRoles,proto3,enum=user.v1.Role" json:"user_roles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ViewMarketRequest) Reset() {
+	*x = ViewMarketRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ViewMarketRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ViewMarketRequest) ProtoMessage() {}
+
+func (x *ViewMarketRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ViewMarketRequest.ProtoReflect.Descriptor instead.
+func (*ViewMarketRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ViewMarketRequest) GetUserRoles() []v1.Role {
+	if x != nil {
+		return x.UserRoles
+	}
+	return nil
+}
+
+type ViewMarketResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Markets       []*Market              `protobuf:"bytes,1,rep,name=markets,proto3" json:"markets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ViewMarketResponse) Reset() {
+	*x = ViewMarketResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ViewMarketResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ViewMarketResponse) ProtoMessage() {}
+
+func (x *ViewMarketResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ViewMarketResponse.ProtoReflect.Descriptor instead.
+func (*ViewMarketResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ViewMarketResponse) GetMarkets() []*Market {
+	if x != nil {
+		return x.Markets
+	}
+	return nil
+}
+
+type GetMarketRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMarketRequest) Reset() {
+	*x = GetMarketRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMarketRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMarketRequest) ProtoMessage() {}
+
+func (x *GetMarketRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMarketRequest.ProtoReflect.Descriptor instead.
+func (*GetMarketRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetMarketRequest) GetMarketId() string {
+	if x != nil {
+		return x.MarketId
+	}
+	return ""
+}
+
+type GetMarketResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Market        *Market                `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMarketResponse) Reset() {
+	*x = GetMarketResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMarketResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMarketResponse) ProtoMessage() {}
+
+func (x *GetMarketResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMarketResponse.ProtoReflect.Descriptor instead.
+func (*GetMarketResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetMarketResponse) GetMarket() *Market {
+	if x != nil {
+		return x.Market
+	}
+	return nil
+}
+
+type CreateMarketRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	RequiredRoles []v1.Role              `protobuf:"varint,2,rep,packed,name=required_roles,json=requiredRoles,proto3,enum=user.v1.Role" json:"required_roles,omitempty"`
+	Enabled       bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateMarketRequest) Reset() {
+	*x = CreateMarketRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateMarketRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateMarketRequest) ProtoMessage() {}
+
+func (x *CreateMarketRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateMarketRequest.ProtoReflect.Descriptor instead.
+func (*CreateMarketRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CreateMarketRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateMarketRequest) GetRequiredRoles() []v1.Role {
+	if x != nil {
+		return x.RequiredRoles
+	}
+	return nil
+}
+
+func (x *CreateMarketRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type CreateMarketResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Market        *Market                `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateMarketResponse) Reset() {
+	*x = CreateMarketResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateMarketResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateMarketResponse) ProtoMessage() {}
+
+func (x *CreateMarketResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateMarketResponse.ProtoReflect.Descriptor instead.
+func (*CreateMarketResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CreateMarketResponse) GetMarket() *Market {
+	if x != nil {
+		return x.Market
+	}
+	return nil
+}
+
+type UpdateMarketDetailsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Enabled       *bool                  `protobuf:"varint,3,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateMarketDetailsRequest) Reset() {
+	*x = UpdateMarketDetailsRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateMarketDetailsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateMarketDetailsRequest) ProtoMessage() {}
+
+func (x *UpdateMarketDetailsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateMarketDetailsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateMarketDetailsRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateMarketDetailsRequest) GetMarketId() string {
+	if x != nil {
+		return x.MarketId
+	}
+	return ""
+}
+
+func (x *UpdateMarketDetailsRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *UpdateMarketDetailsRequest) GetEnabled() bool {
+	if x != nil && x.Enabled != nil {
+		return *x.Enabled
+	}
+	return false
+}
+
+type UpdateMarketDetailsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Market        *Market                `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateMarketDetailsResponse) Reset() {
+	*x = UpdateMarketDetailsResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateMarketDetailsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateMarketDetailsResponse) ProtoMessage() {}
+
+func (x *UpdateMarketDetailsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateMarketDetailsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateMarketDetailsResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateMarketDetailsResponse) GetMarket() *Market {
+	if x != nil {
+		return x.Market
+	}
+	return nil
+}
+
+type UpdateMarketRolesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	RequiredRoles []v1.Role              `protobuf:"varint,2,rep,packed,name=required_roles,json=requiredRoles,proto3,enum=user.v1.Role" json:"required_roles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateMarketRolesRequest) Reset() {
+	*x = UpdateMarketRolesRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateMarketRolesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateMarketRolesRequest) ProtoMessage() {}
+
+func (x *UpdateMarketRolesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateMarketRolesRequest.ProtoReflect.Descriptor instead.
+func (*UpdateMarketRolesRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdateMarketRolesRequest) GetMarketId() string {
+	if x != nil {
+		return x.MarketId
+	}
+	return ""
+}
+
+func (x *UpdateMarketRolesRequest) GetRequiredRoles() []v1.Role {
+	if x != nil {
+		return x.RequiredRoles
+	}
+	return nil
+}
+
+type UpdateMarketRolesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Market        *Market                `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateMarketRolesResponse) Reset() {
+	*x = UpdateMarketRolesResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateMarketRolesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateMarketRolesResponse) ProtoMessage() {}
+
+func (x *UpdateMarketRolesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateMarketRolesResponse.ProtoReflect.Descriptor instead.
+func (*UpdateMarketRolesResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdateMarketRolesResponse) GetMarket() *Market {
+	if x != nil {
+		return x.Market
+	}
+	return nil
+}
+
+type DeleteMarketRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteMarketRequest) Reset() {
+	*x = DeleteMarketRequest{}
+	mi := &file_spot_v1_spot_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteMarketRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteMarketRequest) ProtoMessage() {}
+
+func (x *DeleteMarketRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteMarketRequest.ProtoReflect.Descriptor instead.
+func (*DeleteMarketRequest) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteMarketRequest) GetMarketId() string {
+	if x != nil {
+		return x.MarketId
+	}
+	return ""
+}
+
+type DeleteMarketResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteMarketResponse) Reset() {
+	*x = DeleteMarketResponse{}
+	mi := &file_spot_v1_spot_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteMarketResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteMarketResponse) ProtoMessage() {}
+
+func (x *DeleteMarketResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_spot_v1_spot_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteMarketResponse.ProtoReflect.Descriptor instead.
+func (*DeleteMarketResponse) Descriptor() ([]byte, []int) {
+	return file_spot_v1_spot_proto_rawDescGZIP(), []int{12}
+}
+
 var File_spot_v1_spot_proto protoreflect.FileDescriptor
 
 const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
-	"\x12spot/v1/spot.protoB5B\tSpotProtoP\x01Z&github.com/suprt/trading/proto/spot/v1"
+	"\x12spot/v1/spot.proto\x12\aspot.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12user/v1/user.proto\"\xba\x02\n" +
+	"\x06Market\x12\x1b\n" +
+	"\tmarket_id\x18\x01 \x01(\tR\bmarketId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x124\n" +
+	"\x0erequired_roles\x18\x03 \x03(\x0e2\r.user.v1.RoleR\rrequiredRoles\x12\x18\n" +
+	"\aenabled\x18\x04 \x01(\bR\aenabled\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"\n" +
+	"deleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"M\n" +
+	"\x11ViewMarketRequest\x128\n" +
+	"\n" +
+	"user_roles\x18\x01 \x03(\x0e2\r.user.v1.RoleB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\tuserRoles\"?\n" +
+	"\x12ViewMarketResponse\x12)\n" +
+	"\amarkets\x18\x01 \x03(\v2\x0f.spot.v1.MarketR\amarkets\"9\n" +
+	"\x10GetMarketRequest\x12%\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\"<\n" +
+	"\x11GetMarketResponse\x12'\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x8e\x01\n" +
+	"\x13CreateMarketRequest\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12@\n" +
+	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\x12\x18\n" +
+	"\aenabled\x18\x03 \x01(\bR\aenabled\"?\n" +
+	"\x14CreateMarketResponse\x12'\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x99\x01\n" +
+	"\x1aUpdateMarketDetailsRequest\x12%\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\x12 \n" +
+	"\x04name\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01H\x00R\x04name\x88\x01\x01\x12\x1d\n" +
+	"\aenabled\x18\x03 \x01(\bH\x01R\aenabled\x88\x01\x01B\a\n" +
+	"\x05_nameB\n" +
+	"\n" +
+	"\b_enabled\"F\n" +
+	"\x1bUpdateMarketDetailsResponse\x12'\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x83\x01\n" +
+	"\x18UpdateMarketRolesRequest\x12%\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\x12@\n" +
+	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\n" +
+	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\"D\n" +
+	"\x19UpdateMarketRolesResponse\x12'\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"<\n" +
+	"\x13DeleteMarketRequest\x12%\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\"\x16\n" +
+	"\x14DeleteMarketResponse2\xfb\x03\n" +
+	"\x15SpotInstrumentService\x12F\n" +
+	"\vViewMarkets\x12\x1a.spot.v1.ViewMarketRequest\x1a\x1b.spot.v1.ViewMarketResponse\x12B\n" +
+	"\tGetMarket\x12\x19.spot.v1.GetMarketRequest\x1a\x1a.spot.v1.GetMarketResponse\x12K\n" +
+	"\fCreateMarket\x12\x1c.spot.v1.CreateMarketRequest\x1a\x1d.spot.v1.CreateMarketResponse\x12`\n" +
+	"\x13UpdateMarketDetails\x12#.spot.v1.UpdateMarketDetailsRequest\x1a$.spot.v1.UpdateMarketDetailsResponse\x12Z\n" +
+	"\x11UpdateMarketRoles\x12!.spot.v1.UpdateMarketRolesRequest\x1a\".spot.v1.UpdateMarketRolesResponse\x12K\n" +
+	"\fDeleteMarket\x12\x1c.spot.v1.DeleteMarketRequest\x1a\x1d.spot.v1.DeleteMarketResponseB\x84\x01\n" +
+	"\vcom.spot.v1B\tSpotProtoP\x01Z-github.com/suprt/trading/proto/spot/v1;spotv1\xa2\x02\x03SXX\xaa\x02\aSpot.V1\xca\x02\aSpot\\V1\xe2\x02\x13Spot\\V1\\GPBMetadata\xea\x02\bSpot::V1b\x06proto3"
 
-var file_spot_v1_spot_proto_goTypes = []any{}
+var (
+	file_spot_v1_spot_proto_rawDescOnce sync.Once
+	file_spot_v1_spot_proto_rawDescData []byte
+)
+
+func file_spot_v1_spot_proto_rawDescGZIP() []byte {
+	file_spot_v1_spot_proto_rawDescOnce.Do(func() {
+		file_spot_v1_spot_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_spot_v1_spot_proto_rawDesc), len(file_spot_v1_spot_proto_rawDesc)))
+	})
+	return file_spot_v1_spot_proto_rawDescData
+}
+
+var file_spot_v1_spot_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_spot_v1_spot_proto_goTypes = []any{
+	(*Market)(nil),                      // 0: spot.v1.Market
+	(*ViewMarketRequest)(nil),           // 1: spot.v1.ViewMarketRequest
+	(*ViewMarketResponse)(nil),          // 2: spot.v1.ViewMarketResponse
+	(*GetMarketRequest)(nil),            // 3: spot.v1.GetMarketRequest
+	(*GetMarketResponse)(nil),           // 4: spot.v1.GetMarketResponse
+	(*CreateMarketRequest)(nil),         // 5: spot.v1.CreateMarketRequest
+	(*CreateMarketResponse)(nil),        // 6: spot.v1.CreateMarketResponse
+	(*UpdateMarketDetailsRequest)(nil),  // 7: spot.v1.UpdateMarketDetailsRequest
+	(*UpdateMarketDetailsResponse)(nil), // 8: spot.v1.UpdateMarketDetailsResponse
+	(*UpdateMarketRolesRequest)(nil),    // 9: spot.v1.UpdateMarketRolesRequest
+	(*UpdateMarketRolesResponse)(nil),   // 10: spot.v1.UpdateMarketRolesResponse
+	(*DeleteMarketRequest)(nil),         // 11: spot.v1.DeleteMarketRequest
+	(*DeleteMarketResponse)(nil),        // 12: spot.v1.DeleteMarketResponse
+	(v1.Role)(0),                        // 13: user.v1.Role
+	(*timestamppb.Timestamp)(nil),       // 14: google.protobuf.Timestamp
+}
 var file_spot_v1_spot_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	13, // 0: spot.v1.Market.required_roles:type_name -> user.v1.Role
+	14, // 1: spot.v1.Market.created_at:type_name -> google.protobuf.Timestamp
+	14, // 2: spot.v1.Market.updated_at:type_name -> google.protobuf.Timestamp
+	14, // 3: spot.v1.Market.deleted_at:type_name -> google.protobuf.Timestamp
+	13, // 4: spot.v1.ViewMarketRequest.user_roles:type_name -> user.v1.Role
+	0,  // 5: spot.v1.ViewMarketResponse.markets:type_name -> spot.v1.Market
+	0,  // 6: spot.v1.GetMarketResponse.market:type_name -> spot.v1.Market
+	13, // 7: spot.v1.CreateMarketRequest.required_roles:type_name -> user.v1.Role
+	0,  // 8: spot.v1.CreateMarketResponse.market:type_name -> spot.v1.Market
+	0,  // 9: spot.v1.UpdateMarketDetailsResponse.market:type_name -> spot.v1.Market
+	13, // 10: spot.v1.UpdateMarketRolesRequest.required_roles:type_name -> user.v1.Role
+	0,  // 11: spot.v1.UpdateMarketRolesResponse.market:type_name -> spot.v1.Market
+	1,  // 12: spot.v1.SpotInstrumentService.ViewMarkets:input_type -> spot.v1.ViewMarketRequest
+	3,  // 13: spot.v1.SpotInstrumentService.GetMarket:input_type -> spot.v1.GetMarketRequest
+	5,  // 14: spot.v1.SpotInstrumentService.CreateMarket:input_type -> spot.v1.CreateMarketRequest
+	7,  // 15: spot.v1.SpotInstrumentService.UpdateMarketDetails:input_type -> spot.v1.UpdateMarketDetailsRequest
+	9,  // 16: spot.v1.SpotInstrumentService.UpdateMarketRoles:input_type -> spot.v1.UpdateMarketRolesRequest
+	11, // 17: spot.v1.SpotInstrumentService.DeleteMarket:input_type -> spot.v1.DeleteMarketRequest
+	2,  // 18: spot.v1.SpotInstrumentService.ViewMarkets:output_type -> spot.v1.ViewMarketResponse
+	4,  // 19: spot.v1.SpotInstrumentService.GetMarket:output_type -> spot.v1.GetMarketResponse
+	6,  // 20: spot.v1.SpotInstrumentService.CreateMarket:output_type -> spot.v1.CreateMarketResponse
+	8,  // 21: spot.v1.SpotInstrumentService.UpdateMarketDetails:output_type -> spot.v1.UpdateMarketDetailsResponse
+	10, // 22: spot.v1.SpotInstrumentService.UpdateMarketRoles:output_type -> spot.v1.UpdateMarketRolesResponse
+	12, // 23: spot.v1.SpotInstrumentService.DeleteMarket:output_type -> spot.v1.DeleteMarketResponse
+	18, // [18:24] is the sub-list for method output_type
+	12, // [12:18] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_spot_v1_spot_proto_init() }
@@ -40,18 +803,20 @@ func file_spot_v1_spot_proto_init() {
 	if File_spot_v1_spot_proto != nil {
 		return
 	}
+	file_spot_v1_spot_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_spot_v1_spot_proto_rawDesc), len(file_spot_v1_spot_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   0,
+			NumMessages:   13,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_spot_v1_spot_proto_goTypes,
 		DependencyIndexes: file_spot_v1_spot_proto_depIdxs,
+		MessageInfos:      file_spot_v1_spot_proto_msgTypes,
 	}.Build()
 	File_spot_v1_spot_proto = out.File
 	file_spot_v1_spot_proto_goTypes = nil

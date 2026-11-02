@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package spot.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "user/v1/user.proto";
+
+message Market {
+  string market_id = 1;
+  string name = 2;
+  repeated user.v1.Role required_roles = 3;
+  bool enabled = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  google.protobuf.Timestamp deleted_at = 7;
+}
+
+service SpotInstrumentService {
+  rpc ViewMarkets(ViewMarketRequest) returns (ViewMarketResponse);
+  rpc GetMarket(GetMarketRequest) returns (GetMarketResponse);
+  rpc CreateMarket(CreateMarketRequest) returns (CreateMarketResponse);
+  rpc UpdateMarketDetails(UpdateMarketDetailsRequest) returns (UpdateMarketDetailsResponse);
+  rpc UpdateMarketRoles(UpdateMarketRolesRequest) returns (UpdateMarketRolesResponse);
+  rpc DeleteMarket(DeleteMarketRequest) returns (DeleteMarketResponse);
+}
+
+message ViewMarketRequest {
+  repeated user.v1.Role user_roles = 1 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+}
+message ViewMarketResponse {
+  repeated Market markets = 1;
+}
+
+message GetMarketRequest {
+  string market_id = 1 [(buf.validate.field).string.uuid = true];
+}
+message GetMarketResponse {
+  Market market = 1;
+}
+
+message CreateMarketRequest {
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  repeated user.v1.Role required_roles = 2 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+  bool enabled = 3;
+}
+message CreateMarketResponse {
+  Market market = 1;
+}
+
+message UpdateMarketDetailsRequest {
+  string market_id = 1 [(buf.validate.field).string.uuid = true];
+  optional string name = 2 [(buf.validate.field).string.min_len = 1];
+  optional bool enabled = 3;
+}
+
+message UpdateMarketDetailsResponse {
+  Market market = 1;
+}
+
+message UpdateMarketRolesRequest {
+  string market_id = 1 [(buf.validate.field).string.uuid = true];
+  repeated user.v1.Role required_roles = 2 [
+    (buf.validate.field).enum.defined_only = true,
+    (buf.validate.field).enum.not_in = 0
+  ];
+}
+
+message UpdateMarketRolesResponse {
+  Market market = 1;
+}
+message DeleteMarketRequest {
+  string market_id = 1 [(buf.validate.field).string.uuid = true];
+}
+message DeleteMarketResponse {}

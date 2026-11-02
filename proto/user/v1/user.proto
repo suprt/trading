@@ -7,8 +7,6 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/suprt/trading/proto/user/v1;user_v1";
 
-
-
 enum Role {
   ROLE_UNSPECIFIED = 0;
   ROLE_USER = 1;
@@ -37,7 +35,7 @@ service UserService {
 message User {
   string id = 1;
   string email = 2;
-  string username= 3;
+  string username = 3;
   repeated Role roles = 4;
   int64 roles_version = 5;
   google.protobuf.Timestamp created_at = 6;
@@ -45,17 +43,17 @@ message User {
 }
 
 message PublicProfile {
-  string id =1;
+  string id = 1;
   string username = 2;
   google.protobuf.Timestamp created_at = 3;
 }
 
 message RegisterRequest {
-  string email = 1 [
-    (buf.validate.field).string.email = true
+  string email = 1 [(buf.validate.field).string.email = true];
+  string password = 2 [
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 72
   ];
-  string password = 2 [(buf.validate.field).string.min_len = 8,
-    (buf.validate.field).string.max_len=72];
   string username = 3 [
     (buf.validate.field).string.min_len = 3,
     (buf.validate.field).string.max_len = 30,
@@ -68,11 +66,11 @@ message RegisterResponse {
 }
 
 message LoginRequest {
-  string email = 1 [
-    (buf.validate.field).string.email = true
+  string email = 1 [(buf.validate.field).string.email = true];
+  string password = 2 [
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 72
   ];
-  string password = 2 [(buf.validate.field).string.min_len = 8,
-    (buf.validate.field).string.max_len=72];
 }
 
 message LoginResponse {
@@ -91,7 +89,6 @@ message RefreshTokenResponse {
   string refresh_token = 2;
   int64 access_expires_in = 3; //seconds
 }
-
 
 message GetSelfProfileRequest {}
 
@@ -117,7 +114,7 @@ message AddRoleRequest {
   string user_id = 1 [(buf.validate.field).string.uuid = true];
   Role role = 2 [
     (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in=0
+    (buf.validate.field).enum.not_in = 0
   ];
 }
 
@@ -127,7 +124,7 @@ message RemoveRoleRequest {
   string user_id = 1 [(buf.validate.field).string.uuid = true];
   Role role = 2 [
     (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in=0
+    (buf.validate.field).enum.not_in = 0
   ];
 }
 message RemoveRoleResponse {}
@@ -140,29 +137,31 @@ message GetPublicProfileResponse {
   PublicProfile profile = 1;
 }
 
-message UpdateProfileRequest{
-  optional string email = 1 [
-    (buf.validate.field).string.email = true
-  ];
+message UpdateProfileRequest {
+  optional string email = 1 [(buf.validate.field).string.email = true];
   optional string username = 2 [
     (buf.validate.field).string.min_len = 3,
-    (buf.validate.field).string.max_len=30,
+    (buf.validate.field).string.max_len = 30,
     (buf.validate.field).string.pattern = "^[a-zA-Z0-9_]+$"
   ];
 }
 
-message UpdateProfileResponse{}
+message UpdateProfileResponse {}
 
-message ChangePasswordRequest{
-  string current_password = 1 [(buf.validate.field).string.min_len = 1,
-    (buf.validate.field).string.max_len=72];
-  string new_password = 2 [(buf.validate.field).string.min_len = 8,
-      (buf.validate.field).string.max_len=72];//TODO: password max len 72
+message ChangePasswordRequest {
+  string current_password = 1 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 72
+  ];
+  string new_password = 2 [
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 72
+  ]; //TODO: password max len 72
 }
 
-message ChangePasswordResponse{}
+message ChangePasswordResponse {}
 
-message AdminUpdateProfileRequest{
+message AdminUpdateProfileRequest {
   string user_id = 1 [(buf.validate.field).string.uuid = true];
   optional string email = 2 [(buf.validate.field).string.email = true];
   optional string username = 3 [
@@ -174,7 +173,7 @@ message AdminUpdateProfileRequest{
 
 message AdminUpdateProfileResponse {}
 
-message AdminResetPasswordRequest{
+message AdminResetPasswordRequest {
   string user_id = 1 [(buf.validate.field).string.uuid = true];
 }
 
@@ -187,11 +186,10 @@ message AdminResetPasswordResponse {
 }
 
 message ListUsersRequest {
-  int32 page_size = 1 [
-    (buf.validate.field).int32 ={
-      gte: 1,
-      lte: 100
-    }];
+  int32 page_size = 1 [(buf.validate.field).int32 = {
+    gte: 1
+    lte: 100
+  }];
   string page_token = 2; //cursor: base64(created_at + "|" + id)
 }
 
