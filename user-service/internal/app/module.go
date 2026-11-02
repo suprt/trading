@@ -219,7 +219,7 @@ func Module(cfg userconfig.Config) fx.Option {
 			fx.Annotate(crypto.NewBcryptHasher, fx.As(new(outbound.PasswordHasher))),
 			fx.Annotate(idgen.NewUUIDGen, fx.As(new(outbound.IDGenerator))),
 			fx.Annotate(jwt.NewJWTIssuer, fx.As(new(outbound.TokenIssuer))),
-			fx.Annotate(postgres.NewUoW, fx.As(new(outbound.UnitOfWork))),
+			fx.Annotate(db.NewUoW, fx.As(new(outbound.UnitOfWork))),
 			fx.Annotate(rediscache.NewIdempotencyStore, fx.As(new(outbound.IdempotencyStore))),
 		),
 

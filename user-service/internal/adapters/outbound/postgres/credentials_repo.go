@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	shareddb "github.com/suprt/trading/shared/db"
 	"github.com/suprt/trading/user-service/internal/core/domain"
 	er "github.com/suprt/trading/user-service/internal/core/errors"
 )
@@ -19,7 +20,7 @@ func NewCredentialsRepo(pool *pgxpool.Pool) *CredentialRepo {
 }
 
 func (r *CredentialRepo) Save(ctx context.Context, c *domain.Credentials) error {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	_, err := db.Exec(ctx, `
        	INSERT INTO credentials (user_id, password_hash)
        	VALUES ($1, $2)
@@ -30,7 +31,7 @@ func (r *CredentialRepo) Save(ctx context.Context, c *domain.Credentials) error 
 
 func (r *CredentialRepo) GetByID(ctx context.Context, userID domain.UserID) (*domain.Credentials, error) {
 	var c domain.Credentials
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	err := db.QueryRow(ctx, `
 			SELECT user_id, password_hash FROM credentials WHERE user_id = $1`,
 		userID).Scan(&c.UserID, &c.PasswordHash)

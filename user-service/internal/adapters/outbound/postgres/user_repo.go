@@ -21,7 +21,7 @@ func NewUserRepo(pool *pgxpool.Pool) *UserRepo {
 }
 
 func (r *UserRepo) Create(ctx context.Context, u *domain.User) (err error) {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 
 	_, err = db.Exec(ctx,
 		`INSERT INTO users(id, email, username, roles_version, created_at, updated_at) 
@@ -52,7 +52,7 @@ func (r *UserRepo) Create(ctx context.Context, u *domain.User) (err error) {
 	return nil
 }
 func (r *UserRepo) UpdateProfile(ctx context.Context, u *domain.User) (err error) {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 
 	res, err := db.Exec(ctx, `
 		UPDATE users 
@@ -77,7 +77,7 @@ func (r *UserRepo) UpdateProfile(ctx context.Context, u *domain.User) (err error
 	return nil
 }
 func (r *UserRepo) UpdateRoles(ctx context.Context, u *domain.User) (err error) {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 
 	res, err := db.Exec(ctx, `
 		UPDATE users 
@@ -112,7 +112,7 @@ func (r *UserRepo) UpdateRoles(ctx context.Context, u *domain.User) (err error) 
 func (r *UserRepo) GetByID(ctx context.Context, id domain.UserID) (*domain.User, error) {
 	var u domain.User
 	var roles []string
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	err := db.QueryRow(ctx, `
  			SELECT u.id, u.email, u.username, u.roles_version, u.created_at, u.updated_at,
  			COALESCE(array_agg(r.role) FILTER ( WHERE r.role IS NOT NULL), '{}') AS roles
@@ -138,7 +138,7 @@ func (r *UserRepo) GetByID(ctx context.Context, id domain.UserID) (*domain.User,
 func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var u domain.User
 	var roles []string
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	err := db.QueryRow(ctx, `
  			SELECT u.id, u.email, u.username, u.roles_version, u.created_at, u.updated_at,
  			COALESCE(array_agg(r.role) FILTER ( WHERE r.role IS NOT NULL), '{}') AS roles
@@ -162,7 +162,7 @@ func (r *UserRepo) GetByEmail(ctx context.Context, email string) (*domain.User, 
 }
 
 func (r *UserRepo) List(ctx context.Context, limit int, afterCreatedAt time.Time, afterID domain.UserID) ([]*domain.User, error) {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	var rows pgx.Rows
 	var err error
 

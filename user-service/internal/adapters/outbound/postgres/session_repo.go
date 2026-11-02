@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	shareddb "github.com/suprt/trading/shared/db"
 	"github.com/suprt/trading/user-service/internal/core/domain"
 	er "github.com/suprt/trading/user-service/internal/core/errors"
 )
@@ -19,7 +20,7 @@ func NewSessionRepo(pool *pgxpool.Pool) *SessionRepo {
 }
 
 func (r *SessionRepo) Save(ctx context.Context, s *domain.RefreshSession) error {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	_, err := db.Exec(ctx, `
 				INSERT INTO sessions (token, user_id, expires_at, issued_at)
 				VALUES ($1, $2, $3, $4)`,
@@ -29,7 +30,7 @@ func (r *SessionRepo) Save(ctx context.Context, s *domain.RefreshSession) error 
 
 func (r *SessionRepo) GetByToken(ctx context.Context, t domain.RefreshToken) (*domain.RefreshSession, error) {
 	var s domain.RefreshSession
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	err := db.QueryRow(ctx, `
 				SELECT token, user_id, expires_at, issued_at
 				FROM sessions WHERE token = $1`,
@@ -45,13 +46,13 @@ func (r *SessionRepo) GetByToken(ctx context.Context, t domain.RefreshToken) (*d
 }
 
 func (r *SessionRepo) Delete(ctx context.Context, t domain.RefreshToken) error {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	_, err := db.Exec(ctx, `DELETE FROM sessions WHERE token = $1`, t)
 	return err
 }
 
 func (r *SessionRepo) DeleteByUserID(ctx context.Context, userID domain.UserID) error {
-	db := dbFromContext(ctx, r.pool)
+	db := shareddb.DBFromContext(ctx, r.pool)
 	_, err := db.Exec(ctx, `DELETE FROM sessions WHERE user_id = $1`, userID)
 	return err
 }
