@@ -17,21 +17,22 @@ message Market {
 }
 
 service SpotInstrumentService {
-  rpc ViewMarkets(ViewMarketRequest) returns (ViewMarketResponse);
+  rpc ViewMarkets(ViewMarketsRequest) returns (ViewMarketsResponse);
   rpc GetMarket(GetMarketRequest) returns (GetMarketResponse);
   rpc CreateMarket(CreateMarketRequest) returns (CreateMarketResponse);
   rpc UpdateMarketDetails(UpdateMarketDetailsRequest) returns (UpdateMarketDetailsResponse);
   rpc UpdateMarketRoles(UpdateMarketRolesRequest) returns (UpdateMarketRolesResponse);
   rpc DeleteMarket(DeleteMarketRequest) returns (DeleteMarketResponse);
+  rpc ListAllMarkets(ListAllMarketsRequest) returns (ListAllMarketsResponse);
 }
 
-message ViewMarketRequest {
+message ViewMarketsRequest {
   repeated user.v1.Role user_roles = 1 [
     (buf.validate.field).enum.defined_only = true,
     (buf.validate.field).enum.not_in = 0
   ];
 }
-message ViewMarketResponse {
+message ViewMarketsResponse {
   repeated Market markets = 1;
 }
 
@@ -79,3 +80,12 @@ message DeleteMarketRequest {
   string market_id = 1 [(buf.validate.field).string.uuid = true];
 }
 message DeleteMarketResponse {}
+
+message ListAllMarketsRequest {
+  bool include_deleted  = 1;
+  bool include_disabled = 2;
+}
+
+message ListAllMarketsResponse {
+  repeated Market markets = 1;
+}

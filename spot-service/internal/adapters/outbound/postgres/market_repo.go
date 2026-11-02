@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -45,7 +46,6 @@ func (r *MarketRepo) List(ctx context.Context) ([]*domain.Market, error) {
 	rows, err := db.Query(ctx, `
 			SELECT id, name, required_roles, enabled, deleted_at, created_at, updated_at
 			FROM markets
-			WHERE enabled = TRUE AND deleted_at IS NULL
 			ORDER BY created_at DESC
 			`)
 	if err != nil {
@@ -174,4 +174,42 @@ func (r *MarketRepo) SoftDelete(ctx context.Context, id domain.MarketID, deleted
 		return er.ErrMarketNotFound
 	}
 	return nil
+}
+
+func (r *MarketRepo) ListAll(ctx context.Context, includeDeleted bool, includeDisabled bool) ([]*domain.Market, error) {
+	db := shareddb.DBFromContext(ctx, r.pool)
+	query := `
+		SELECT id, name, required_roles, enabled, deleted_at, created_at, updated_at
+		FROM markets
+	`
+	var conditions []string
+	if !includeDeleted {
+		conditions = append(conditions, "deleted_at IS NULL")
+	}
+	if !includeDisabled {
+		conditions = append(conditions, "enabled = TRUE")
+	}
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+	query += " ORDER BY created_at DESC"
+
+	rows, err := db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var markets []*domain.Market
+	for rows.Next() {
+		m, err := scanMarket(rows)
+		if err != nil {
+			return nil, err
+		}
+		markets = append(markets, m)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return markets, nil
 }

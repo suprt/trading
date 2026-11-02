@@ -11,6 +11,7 @@ import (
 	userv1 "github.com/suprt/trading/proto/user/v1"
 	"github.com/suprt/trading/shared/bootstrap"
 	"github.com/suprt/trading/shared/db"
+	"github.com/suprt/trading/shared/idgen"
 	sharedinters "github.com/suprt/trading/shared/interceptors"
 	"github.com/suprt/trading/shared/logger"
 	shareredis "github.com/suprt/trading/shared/redis"
@@ -19,7 +20,6 @@ import (
 	userinters "github.com/suprt/trading/user-service/internal/adapters/inbound/interceptors"
 	"github.com/suprt/trading/user-service/internal/adapters/outbound/cached"
 	"github.com/suprt/trading/user-service/internal/adapters/outbound/crypto"
-	"github.com/suprt/trading/user-service/internal/adapters/outbound/idgen"
 	"github.com/suprt/trading/user-service/internal/adapters/outbound/jwt"
 	"github.com/suprt/trading/user-service/internal/adapters/outbound/postgres"
 	"github.com/suprt/trading/user-service/internal/adapters/outbound/rediscache"
@@ -186,7 +186,7 @@ func Module(cfg userconfig.Config) fx.Option {
 					sharedinters.XRequestID(),
 					sharedinters.Logger(logger),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
-					userinters.UnaryAuth(tokens, cfg.Auth.Whitelist),
+					userinters.UnaryAuth(tokens, cfg.Auth.Whitelist, cfg.Internal.Secret),
 					userinters.UnaryValidation(),
 				}
 			},
@@ -239,6 +239,7 @@ func Module(cfg userconfig.Config) fx.Option {
 			application.NewAdminUpdateProfileUseCase,
 			application.NewAdminResetPasswordUseCase,
 			application.NewListUsersUseCase,
+			application.NewGetUserRolesUseCase,
 			application.NewService,
 		),
 

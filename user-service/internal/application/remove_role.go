@@ -12,8 +12,6 @@ import (
 	"github.com/suprt/trading/user-service/internal/core/ports/outbound"
 )
 
-// TODO: после добавления redis обновить инвалидацию
-
 type RemoveRoleUseCase struct {
 	users outbound.UserRepository
 	ses   outbound.SessionRepository

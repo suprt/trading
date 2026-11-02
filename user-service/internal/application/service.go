@@ -15,6 +15,7 @@ type Service struct {
 	*AdminUpdateProfileUseCase
 	*AdminResetPasswordUseCase
 	*ListUsersUseCase
+	*GetUserRolesUseCase
 }
 
 func NewService(
@@ -32,6 +33,7 @@ func NewService(
 	adminUpdateProfile *AdminUpdateProfileUseCase,
 	adminResetPassword *AdminResetPasswordUseCase,
 	listUsersUseCase *ListUsersUseCase,
+	getUserRolesUseCase *GetUserRolesUseCase,
 ) *Service {
 	return &Service{
 		RegisterUseCase:           register,
@@ -48,5 +50,6 @@ func NewService(
 		AdminUpdateProfileUseCase: adminUpdateProfile,
 		AdminResetPasswordUseCase: adminResetPassword,
 		ListUsersUseCase:          listUsersUseCase,
+		GetUserRolesUseCase:       getUserRolesUseCase,
 	}
 }

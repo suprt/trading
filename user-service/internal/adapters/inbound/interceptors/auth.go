@@ -7,18 +7,13 @@ import (
 	"github.com/suprt/trading/user-service/internal/core/auth"
 	"github.com/suprt/trading/user-service/internal/core/domain"
 	"github.com/suprt/trading/user-service/internal/core/ports/outbound"
-	userconfig "github.com/suprt/trading/user-service/internal/infrastructure/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
-func NewAuthInter(cfg userconfig.Config, tokens outbound.TokenIssuer) grpc.UnaryServerInterceptor {
-	return UnaryAuth(tokens, cfg.Auth.Whitelist)
-}
-
-func UnaryAuth(tokens outbound.TokenIssuer, wl map[string]struct{}) grpc.UnaryServerInterceptor {
+func UnaryAuth(tokens outbound.TokenIssuer, wl map[string]struct{}, internalSecret string) grpc.UnaryServerInterceptor {
 
 	return func(
 		ctx context.Context,
@@ -26,6 +21,17 @@ func UnaryAuth(tokens outbound.TokenIssuer, wl map[string]struct{}) grpc.UnarySe
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (any, error) {
+		
+		if info.FullMethod == "/user.v1.UserService/GetUserRoles" {
+			md, _ := metadata.FromIncomingContext(ctx)
+			if vals := md.Get("x-internal-secret"); len(vals) > 0 && vals[0] == internalSecret {
+				return handler(ctx, req) 
+			}
+			return nil, status.Error(codes.PermissionDenied, "internal only")
+		}
+
+
+
 		if _, exist := wl[info.FullMethod]; exist {
 			return handler(ctx, req)
 		}
@@ -45,13 +51,12 @@ func UnaryAuth(tokens outbound.TokenIssuer, wl map[string]struct{}) grpc.UnarySe
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header")
 		}
 
-		userID, roles, _, err := tokens.ParseAccess(domain.AccessToken(raw))
+		userID, _, _, err := tokens.ParseAccess(domain.AccessToken(raw))
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid token")
 		}
 
 		ctx = auth.WithUserID(ctx, userID)
-		ctx = auth.WithRoles(ctx, roles)
 		return handler(ctx, req)
 	}
 }

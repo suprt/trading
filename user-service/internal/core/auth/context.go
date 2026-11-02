@@ -10,7 +10,6 @@ type ctxKey int
 
 const (
 	userIDKey ctxKey = iota
-	rolesKey
 )
 
 func WithUserID(ctx context.Context, id domain.UserID) context.Context {
@@ -20,13 +19,4 @@ func WithUserID(ctx context.Context, id domain.UserID) context.Context {
 func UserIDFromContext(ctx context.Context) (domain.UserID, bool) {
 	id, ok := ctx.Value(userIDKey).(domain.UserID)
 	return id, ok
-}
-
-func WithRoles(ctx context.Context, roles []domain.Role) context.Context {
-	return context.WithValue(ctx, rolesKey, roles)
-}
-
-func RolesFromContext(ctx context.Context) ([]domain.Role, bool) {
-	roles, ok := ctx.Value(rolesKey).([]domain.Role)
-	return roles, ok
 }

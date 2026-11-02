@@ -29,7 +29,7 @@ service UserService {
   rpc AdminUpdateProfile(AdminUpdateProfileRequest) returns (AdminUpdateProfileResponse);
   rpc AdminResetPassword(AdminResetPasswordRequest) returns (AdminResetPasswordResponse);
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
-  //TODO: GetUserList
+  rpc GetUserRoles(GetUserRolesRequest) returns (GetUserRolesResponse); //Internal endpoint
 }
 
 message User {
@@ -156,7 +156,7 @@ message ChangePasswordRequest {
   string new_password = 2 [
     (buf.validate.field).string.min_len = 8,
     (buf.validate.field).string.max_len = 72
-  ]; //TODO: password max len 72
+  ];
 }
 
 message ChangePasswordResponse {}
@@ -196,4 +196,13 @@ message ListUsersRequest {
 message ListUsersResponse {
   repeated User users = 1;
   string next_page_token = 2;
+}
+
+message GetUserRolesRequest {
+  string user_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetUserRolesResponse {
+  repeated Role roles = 1;
+  int32 roles_version = 2;
 }

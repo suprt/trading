@@ -1,0 +1,29 @@
+auth:
+  whitelist:
+    "/spot.v1.SpotInstrumentService/ViewMarkets": {}
+    "/spot.v1.SpotInstrumentService/GetMarket": {}
+
+seed:
+  enabled: true
+  markets:
+    - name: "BTC/USDT"
+      required_roles: []
+      enabled: true
+    - name: "ETH/USDT"
+      required_roles: []
+      enabled: true
+    - name: "SOL/USDT"
+      required_roles: ["TRADER"]
+      enabled: true
+    - name: "DOGE/USDT"
+      required_roles: ["ADMIN"]
+      enabled: true
+
+rate_limiter:
+  default:
+    limit: 60
+    window: 1m
+  methods:
+    "/spot.v1.SpotInstrumentService/GetMarket":
+      limit: 120
+      window: 1m

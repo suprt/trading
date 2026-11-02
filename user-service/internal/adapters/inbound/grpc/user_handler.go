@@ -29,9 +29,9 @@ func (h *Handler) Register(ctx context.Context, req *userv1.RegisterRequest) (*u
 	}
 
 	out, err := h.userService.Register(ctx, dto.RegisterInput{
-		Email:    req.GetEmail(),
-		Username: req.GetUsername(),
-		Password: req.GetPassword(),
+		Email:          req.GetEmail(),
+		Username:       req.GetUsername(),
+		Password:       req.GetPassword(),
 		IdempotencyKey: idemKey,
 	})
 	if err != nil {
@@ -206,7 +206,7 @@ func (h *Handler) AdminResetPassword(ctx context.Context,
 
 func (h *Handler) ListUsers(ctx context.Context, req *userv1.ListUsersRequest) (*userv1.ListUsersResponse, error) {
 	out, err := h.userService.ListUsers(ctx, dto.ListUsersInput{
-		PageSize: req.GetPageSize(),
+		PageSize:  req.GetPageSize(),
 		PageToken: req.GetPageToken(),
 	})
 	if err != nil {
@@ -219,7 +219,26 @@ func (h *Handler) ListUsers(ctx context.Context, req *userv1.ListUsersRequest) (
 	}
 
 	return &userv1.ListUsersResponse{
-		Users: users,
+		Users:         users,
 		NextPageToken: out.NextPageToken,
+	}, nil
+}
+
+func (h *Handler) GetUserRoles(ctx context.Context, req *userv1.GetUserRolesRequest) (*userv1.GetUserRolesResponse, error) {
+	out, err := h.userService.GetUserRoles(ctx, dto.GetUserRolesInput{
+		UserID: domain.UserID(req.UserId),
+	})
+	if err != nil {
+		return nil, mapErr(err)
+	}
+
+	roles := make([]userv1.Role, len(out.Roles))
+	for i, r := range out.Roles {
+		roles[i] = roleToProto(r)
+	}
+
+	return &userv1.GetUserRolesResponse{
+		Roles:        roles,
+		RolesVersion: int32(out.RolesVersion),
 	}, nil
 }

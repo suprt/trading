@@ -1,7 +1,5 @@
 package domain
 
-import "slices"
-
 import "time"
 
 type MarketID string
@@ -29,8 +27,10 @@ func (m *Market) AvailableFor(userRoles []Role) bool {
 		return true
 	}
 	for _, required := range m.RequiredRoles {
-		if slices.Contains(userRoles, required) {
-			return true
+		for _, userRole := range userRoles {
+			if RoleIncludes(userRole, required) {
+				return true
+			}
 		}
 	}
 	return false

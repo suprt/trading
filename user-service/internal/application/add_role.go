@@ -1,6 +1,5 @@
 package application
 
-// TODO: после добавления redis обновить инвалидацию
 import (
 	"context"
 	"errors"

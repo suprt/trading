@@ -25,18 +25,20 @@ const (
 	SpotInstrumentService_UpdateMarketDetails_FullMethodName = "/spot.v1.SpotInstrumentService/UpdateMarketDetails"
 	SpotInstrumentService_UpdateMarketRoles_FullMethodName   = "/spot.v1.SpotInstrumentService/UpdateMarketRoles"
 	SpotInstrumentService_DeleteMarket_FullMethodName        = "/spot.v1.SpotInstrumentService/DeleteMarket"
+	SpotInstrumentService_ListAllMarkets_FullMethodName      = "/spot.v1.SpotInstrumentService/ListAllMarkets"
 )
 
 // SpotInstrumentServiceClient is the client API for SpotInstrumentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SpotInstrumentServiceClient interface {
-	ViewMarkets(ctx context.Context, in *ViewMarketRequest, opts ...grpc.CallOption) (*ViewMarketResponse, error)
+	ViewMarkets(ctx context.Context, in *ViewMarketsRequest, opts ...grpc.CallOption) (*ViewMarketsResponse, error)
 	GetMarket(ctx context.Context, in *GetMarketRequest, opts ...grpc.CallOption) (*GetMarketResponse, error)
 	CreateMarket(ctx context.Context, in *CreateMarketRequest, opts ...grpc.CallOption) (*CreateMarketResponse, error)
 	UpdateMarketDetails(ctx context.Context, in *UpdateMarketDetailsRequest, opts ...grpc.CallOption) (*UpdateMarketDetailsResponse, error)
 	UpdateMarketRoles(ctx context.Context, in *UpdateMarketRolesRequest, opts ...grpc.CallOption) (*UpdateMarketRolesResponse, error)
 	DeleteMarket(ctx context.Context, in *DeleteMarketRequest, opts ...grpc.CallOption) (*DeleteMarketResponse, error)
+	ListAllMarkets(ctx context.Context, in *ListAllMarketsRequest, opts ...grpc.CallOption) (*ListAllMarketsResponse, error)
 }
 
 type spotInstrumentServiceClient struct {
@@ -47,9 +49,9 @@ func NewSpotInstrumentServiceClient(cc grpc.ClientConnInterface) SpotInstrumentS
 	return &spotInstrumentServiceClient{cc}
 }
 
-func (c *spotInstrumentServiceClient) ViewMarkets(ctx context.Context, in *ViewMarketRequest, opts ...grpc.CallOption) (*ViewMarketResponse, error) {
+func (c *spotInstrumentServiceClient) ViewMarkets(ctx context.Context, in *ViewMarketsRequest, opts ...grpc.CallOption) (*ViewMarketsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ViewMarketResponse)
+	out := new(ViewMarketsResponse)
 	err := c.cc.Invoke(ctx, SpotInstrumentService_ViewMarkets_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -107,16 +109,27 @@ func (c *spotInstrumentServiceClient) DeleteMarket(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *spotInstrumentServiceClient) ListAllMarkets(ctx context.Context, in *ListAllMarketsRequest, opts ...grpc.CallOption) (*ListAllMarketsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAllMarketsResponse)
+	err := c.cc.Invoke(ctx, SpotInstrumentService_ListAllMarkets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SpotInstrumentServiceServer is the server API for SpotInstrumentService service.
 // All implementations must embed UnimplementedSpotInstrumentServiceServer
 // for forward compatibility.
 type SpotInstrumentServiceServer interface {
-	ViewMarkets(context.Context, *ViewMarketRequest) (*ViewMarketResponse, error)
+	ViewMarkets(context.Context, *ViewMarketsRequest) (*ViewMarketsResponse, error)
 	GetMarket(context.Context, *GetMarketRequest) (*GetMarketResponse, error)
 	CreateMarket(context.Context, *CreateMarketRequest) (*CreateMarketResponse, error)
 	UpdateMarketDetails(context.Context, *UpdateMarketDetailsRequest) (*UpdateMarketDetailsResponse, error)
 	UpdateMarketRoles(context.Context, *UpdateMarketRolesRequest) (*UpdateMarketRolesResponse, error)
 	DeleteMarket(context.Context, *DeleteMarketRequest) (*DeleteMarketResponse, error)
+	ListAllMarkets(context.Context, *ListAllMarketsRequest) (*ListAllMarketsResponse, error)
 	mustEmbedUnimplementedSpotInstrumentServiceServer()
 }
 
@@ -127,7 +140,7 @@ type SpotInstrumentServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedSpotInstrumentServiceServer struct{}
 
-func (UnimplementedSpotInstrumentServiceServer) ViewMarkets(context.Context, *ViewMarketRequest) (*ViewMarketResponse, error) {
+func (UnimplementedSpotInstrumentServiceServer) ViewMarkets(context.Context, *ViewMarketsRequest) (*ViewMarketsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ViewMarkets not implemented")
 }
 func (UnimplementedSpotInstrumentServiceServer) GetMarket(context.Context, *GetMarketRequest) (*GetMarketResponse, error) {
@@ -144,6 +157,9 @@ func (UnimplementedSpotInstrumentServiceServer) UpdateMarketRoles(context.Contex
 }
 func (UnimplementedSpotInstrumentServiceServer) DeleteMarket(context.Context, *DeleteMarketRequest) (*DeleteMarketResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteMarket not implemented")
+}
+func (UnimplementedSpotInstrumentServiceServer) ListAllMarkets(context.Context, *ListAllMarketsRequest) (*ListAllMarketsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAllMarkets not implemented")
 }
 func (UnimplementedSpotInstrumentServiceServer) mustEmbedUnimplementedSpotInstrumentServiceServer() {}
 func (UnimplementedSpotInstrumentServiceServer) testEmbeddedByValue()                               {}
@@ -167,7 +183,7 @@ func RegisterSpotInstrumentServiceServer(s grpc.ServiceRegistrar, srv SpotInstru
 }
 
 func _SpotInstrumentService_ViewMarkets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ViewMarketRequest)
+	in := new(ViewMarketsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -179,7 +195,7 @@ func _SpotInstrumentService_ViewMarkets_Handler(srv interface{}, ctx context.Con
 		FullMethod: SpotInstrumentService_ViewMarkets_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SpotInstrumentServiceServer).ViewMarkets(ctx, req.(*ViewMarketRequest))
+		return srv.(SpotInstrumentServiceServer).ViewMarkets(ctx, req.(*ViewMarketsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -274,6 +290,24 @@ func _SpotInstrumentService_DeleteMarket_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SpotInstrumentService_ListAllMarkets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllMarketsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SpotInstrumentServiceServer).ListAllMarkets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SpotInstrumentService_ListAllMarkets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SpotInstrumentServiceServer).ListAllMarkets(ctx, req.(*ListAllMarketsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SpotInstrumentService_ServiceDesc is the grpc.ServiceDesc for SpotInstrumentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var SpotInstrumentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMarket",
 			Handler:    _SpotInstrumentService_DeleteMarket_Handler,
+		},
+		{
+			MethodName: "ListAllMarkets",
+			Handler:    _SpotInstrumentService_ListAllMarkets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

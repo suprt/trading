@@ -17,6 +17,27 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  spot-service:
+    build:
+      context: .
+      dockerfile: spot-service/Dockerfile
+    container_name: trading-spot-service
+    ports:
+      - "50052:50052"
+    env_file:
+      - spot-service/.env
+    environment:
+      POSTGRES_DSN: "postgres://trading:trading@postgres-spot:5432/spot_db?sslmode=disable"
+      USER_SERVICE_ADDR: "user-service:50051"
+    depends_on:
+      postgres-spot:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    restart: unless-stopped
+
   redis:
     image: redis:8.10.2-alpine
     command: >
