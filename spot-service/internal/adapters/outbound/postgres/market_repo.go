@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -106,7 +105,7 @@ func (r *MarketRepo) Create(ctx context.Context, m *domain.Market) error {
 	_, err := db.Exec(ctx, `
 			INSERT INTO markets (id, name, required_roles, enabled, created_at, updated_at)
 			VALUES ($1, $2, $3, $4, $5, $6)`,
-		m.ID, m.Name, m.RequiredRoles, m.Enabled, m.CreatedAt, m.UpdatedAt)
+		m.ID, m.Name, roles, m.Enabled, m.CreatedAt, m.UpdatedAt)
 	if err != nil {
 		if uv, ok := shareddb.AsUniqueViolation(err); ok {
 			if uv.Constraint == "markets_name_unique" {
@@ -150,7 +149,7 @@ func (r *MarketRepo) UpdateRoles(ctx context.Context, m *domain.Market) error {
 			UPDATE markets
 			SET required_roles = $1, updated_at = $2
 			WHERE id = $3`,
-		m.RequiredRoles, m.UpdatedAt, m.ID)
+		roles, m.UpdatedAt, m.ID)
 	if err != nil {
 		return err
 	}
@@ -174,42 +173,4 @@ func (r *MarketRepo) SoftDelete(ctx context.Context, id domain.MarketID, deleted
 		return er.ErrMarketNotFound
 	}
 	return nil
-}
-
-func (r *MarketRepo) ListAll(ctx context.Context, includeDeleted bool, includeDisabled bool) ([]*domain.Market, error) {
-	db := shareddb.DBFromContext(ctx, r.pool)
-	query := `
-		SELECT id, name, required_roles, enabled, deleted_at, created_at, updated_at
-		FROM markets
-	`
-	var conditions []string
-	if !includeDeleted {
-		conditions = append(conditions, "deleted_at IS NULL")
-	}
-	if !includeDisabled {
-		conditions = append(conditions, "enabled = TRUE")
-	}
-	if len(conditions) > 0 {
-		query += " WHERE " + strings.Join(conditions, " AND ")
-	}
-	query += " ORDER BY created_at DESC"
-
-	rows, err := db.Query(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var markets []*domain.Market
-	for rows.Next() {
-		m, err := scanMarket(rows)
-		if err != nil {
-			return nil, err
-		}
-		markets = append(markets, m)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return markets, nil
 }

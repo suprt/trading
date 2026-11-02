@@ -31,10 +31,21 @@ func (uc *ListAllMarketsUseCase) ListAllMarkets(ctx context.Context, in dto.List
 		return nil, er.ErrForbidden
 	}
 
-	markets, err := uc.markets.ListAll(ctx, in.IncludeDeleted, in.IncludeDisabled)
+	all, err := uc.markets.List(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.ListAllMarketsOutput{Markets: markets}, nil
+	var result []*domain.Market
+	for _, m := range all {
+		if !in.IncludeDeleted && m.DeletedAt != nil {
+			continue
+		}
+		if !in.IncludeDisabled && !m.Enabled {
+			continue
+		}
+		result = append(result, m)
+	}
+
+	return &dto.ListAllMarketsOutput{Markets: result}, nil
 }

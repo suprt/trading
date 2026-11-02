@@ -17,8 +17,8 @@ type DeleteMarketUseCase struct {
 	ids     outbound.IDGenerator
 }
 
-func NewDeleteMarketUseCase(m outbound.MarketRepository, u outbound.UserClient, ids outbound.IDGenerator) *DeleteMarketUseCase {
-	return &DeleteMarketUseCase{markets: m, users: u, ids: ids}
+func NewDeleteMarketUseCase(m outbound.MarketRepository, u outbound.UserClient) *DeleteMarketUseCase {
+	return &DeleteMarketUseCase{markets: m, users: u}
 }
 
 func (uc *DeleteMarketUseCase) DeleteMarket(ctx context.Context, in dto.DeleteMarketInput) error {

@@ -1,3 +1,4 @@
+//go:generate mockgen -source=spot_service.go -destination=mocks/mock_spot_service.go -package=mocks
 package inbound
 
 import (

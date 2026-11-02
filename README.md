@@ -5,7 +5,7 @@
 ## Сервисы
 
 - [`user-service`](./user-service/README.md) — аутентификация, пользователи, роли
-- `spot-service` — рынки (в планах)
+- [`spot-service`](./spot-service/README.md) — рынки 
 - `order-service` — заказы (в планах)
 - `client` — консольный клиент (в планах)
 

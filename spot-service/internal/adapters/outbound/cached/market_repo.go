@@ -78,10 +78,6 @@ func (r *MarketRepo) GetByName(ctx context.Context, name string) (*domain.Market
 	return r.next.GetByName(ctx, name)
 }
 
-func (r *MarketRepo) ListAll(ctx context.Context, includeDeleted bool, includeDisabled bool) ([]*domain.Market, error) {
-	return r.next.ListAll(ctx, includeDeleted, includeDisabled)
-}
-
 func (r *MarketRepo) Create(ctx context.Context, m *domain.Market) error {
 	if err := r.next.Create(ctx, m); err != nil {
 		return err

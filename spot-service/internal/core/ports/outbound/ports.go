@@ -15,7 +15,6 @@ type MarketRepository interface {
 	UpdateDetails(ctx context.Context, m *domain.Market) error
 	UpdateRoles(ctx context.Context, m *domain.Market) error
 	SoftDelete(ctx context.Context, id domain.MarketID, deletedAt time.Time) error
-	ListAll(ctx context.Context, includeDeleted bool, includeDisabled bool) ([]*domain.Market, error)
 }
 
 type UnitOfWork interface {
