@@ -107,7 +107,15 @@ func (r *MarketRepo) Create(ctx context.Context, m *domain.Market) error {
 			INSERT INTO markets (id, name, required_roles, enabled, created_at, updated_at)
 			VALUES ($1, $2, $3, $4, $5, $6)`,
 		m.ID, m.Name, m.RequiredRoles, m.Enabled, m.CreatedAt, m.UpdatedAt)
-	return err
+	if err != nil {
+		if uv, ok := shareddb.AsUniqueViolation(err); ok {
+			if uv.Constraint == "markets_name_unique" {
+				return er.ErrMarketNameTaken
+			}
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *MarketRepo) UpdateDetails(ctx context.Context, m *domain.Market) error {
@@ -118,6 +126,11 @@ func (r *MarketRepo) UpdateDetails(ctx context.Context, m *domain.Market) error 
 			WHERE id = $4`,
 		m.Name, m.Enabled, m.UpdatedAt, m.ID)
 	if err != nil {
+		if uv, ok := shareddb.AsUniqueViolation(err); ok {
+			if uv.Constraint == "markets_name_unique" {
+				return er.ErrMarketNameTaken
+			}
+		}
 		return err
 	}
 	if res.RowsAffected() == 0 {
