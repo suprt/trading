@@ -8,6 +8,6 @@ func (UUIDGen) New() string {
 	return uuid.NewString()
 }
 
-func NewUUIDGen() *UUIDGen {
-	return &UUIDGen{}
+func NewUUIDGen() UUIDGen {
+	return UUIDGen{}
 }

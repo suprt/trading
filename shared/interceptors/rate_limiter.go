@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/suprt/trading/shared/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -17,13 +17,11 @@ import (
 )
 
 type RateLimiterRule struct {
-	Limit  int
-	Window time.Duration
+	config.RateLimiterRule
 }
 
 type RateLimiterConfig struct {
-	Default RateLimiterRule
-	Methods map[string]RateLimiterRule
+	config.RateLimiter
 }
 
 type ErrorReporter interface {

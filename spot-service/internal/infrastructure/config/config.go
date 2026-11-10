@@ -16,12 +16,16 @@ type Config struct {
 	GRPC        GRPC
 	Postgres    Postgres
 	Cache       Cache
-	
+	Timeouts    Timeouts
+
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
 	Auth                     Auth `yaml:"auth"`
 	Seed                     Seed `yaml:"seed"`
 }
 
+type Timeouts struct {
+	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
+}
 type UserService struct {
 	Addr string `env:"USER_SERVICE_ADDR" envDefault:"user-service:50051"`
 }
@@ -31,8 +35,9 @@ type Internal struct {
 }
 
 type GRPC struct {
-	Addr        string        `env:"GRPC_ADDR" envDefault:":50052"`
-	StopTimeout time.Duration `env:"GRPC_STOP_TIMEOUT" envDefault:"15s"`
+	Addr         string        `env:"GRPC_ADDR" envDefault:":50052"`
+	StopTimeout  time.Duration `env:"GRPC_STOP_TIMEOUT" envDefault:"15s"`
+	StartTimeout time.Duration `env:"GRPC_START_TIMEOUT" envDefault:"30s"`
 }
 
 type Postgres struct {
@@ -45,6 +50,7 @@ type Postgres struct {
 
 type Cache struct {
 	MarketsTTL time.Duration `env:"CACHE_MARKETS_TTL" envDefault:"24h"`
+	LockTTL    time.Duration `env:"CACHE_LOCK_TTL" envDefault:"5s"`
 }
 
 type Auth struct {

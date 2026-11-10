@@ -7,7 +7,7 @@ import (
 )
 
 func NewApp(opts Options) *fx.App {
-	stopTimeout := opts.StopTimeout
+	//TODO: start timeout
 	return fx.New(
 		fx.Provide(func() grpcServer.Addr {
 			return grpcServer.Addr(opts.Addr)
@@ -15,7 +15,8 @@ func NewApp(opts Options) *fx.App {
 		fx.Provide(func() *zap.Logger {
 			return opts.Log
 		}),
-		fx.StopTimeout(stopTimeout),
+		fx.StartTimeout(opts.StartTimeout),
+		fx.StopTimeout(opts.StopTimeout),
 		fx.Provide(grpcServer.New),
 		fx.Options(opts.Modules...))
 }

@@ -7,12 +7,13 @@ import (
 )
 
 type GRPC struct {
-	Addr        string        `env:"GRPC_ADDR" envDefault:":50051"`
-	StopTimeout time.Duration `env:"GRPC_STOP_TIMEOUT" envDefault:"15s"`
+	Addr         string        `env:"GRPC_ADDR" envDefault:":50051"`
+	StopTimeout  time.Duration `env:"GRPC_STOP_TIMEOUT" envDefault:"15s"`
+	StartTimeout time.Duration `env:"GRPC_START_TIMEOUT" envDefault:"30s"`
 }
 
 type JWT struct {
-	AccessTTL  time.Duration `env:"JWT_ACCESS_TTL" envDefault:"15s"`
+	AccessTTL  time.Duration `env:"JWT_ACCESS_TTL" envDefault:"15m"`
 	RefreshTTL time.Duration `env:"JWT_REFRESH_TTL" envDefault:"168h"`
 }
 
@@ -41,6 +42,18 @@ type Config struct {
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
 	Seed                     Seed `yaml:"seed"`
 	Auth                     Auth `yaml:"auth"`
+	Sessions                 Sessions
+	Timeouts                 Timeouts
+}
+
+type Sessions struct {
+	CleanupEnabled  bool          `env:"SESSIONS_CLEANUP_ENABLED"  envDefault:"true"`
+	CleanupInterval time.Duration `env:"SESSIONS_CLEANUP_INTERVAL" envDefault:"15m"`
+}
+
+type Timeouts struct {
+	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
+	SessionCleanup  time.Duration `env:"TIMEOUT_SESSION_CLEANUP" envDefault:"20s"`
 }
 
 type Idempotency struct {

@@ -33,7 +33,7 @@ service UserService {
 }
 
 message User {
-  string id = 1;
+  string id = 1 [(buf.validate.field).string.uuid=true]; //TODO: buf.validate uuid
   string email = 2;
   string username = 3;
   repeated Role roles = 4;
@@ -190,7 +190,7 @@ message ListUsersRequest {
     gte: 1
     lte: 100
   }];
-  string page_token = 2; //cursor: base64(created_at + "|" + id)
+  string page_token = 2[(buf.validate.field).string.max_len=256]; //cursor: base64(created_at + "|" + id) TODO: ограничить размер len 256
 }
 
 message ListUsersResponse {
@@ -204,5 +204,5 @@ message GetUserRolesRequest {
 
 message GetUserRolesResponse {
   repeated Role roles = 1;
-  int32 roles_version = 2;
+  int64 roles_version = 2;
 }

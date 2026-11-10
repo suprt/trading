@@ -8,8 +8,9 @@ import (
 )
 
 type Options struct {
-	Addr        string
-	Modules     []fx.Option
-	StopTimeout time.Duration
-	Log         *zap.Logger
+	Addr         string
+	Modules      []fx.Option
+	StopTimeout  time.Duration
+	StartTimeout time.Duration
+	Log          *zap.Logger
 }

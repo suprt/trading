@@ -26,7 +26,7 @@ const (
 
 type Market struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"` //TODO: validate uuid
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	RequiredRoles []v1.Role              `protobuf:"varint,3,rep,packed,name=required_roles,json=requiredRoles,proto3,enum=user.v1.Role" json:"required_roles,omitempty"`
 	Enabled       bool                   `protobuf:"varint,4,opt,name=enabled,proto3" json:"enabled,omitempty"`

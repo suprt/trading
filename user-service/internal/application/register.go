@@ -49,8 +49,6 @@ func NewRegisterUseCase(
 
 func (r *RegisterUseCase) Register(ctx context.Context, in dto.RegisterInput) (*dto.RegisterOutput, error) {
 
-	//TODO: get idem key in handler. Remove payload hash
-
 	if in.IdempotencyKey != "" {
 		rec, err := r.idemStore.Get(ctx, in.IdempotencyKey)
 		if err != nil {
@@ -107,6 +105,7 @@ func (r *RegisterUseCase) doRegister(ctx context.Context, in dto.RegisterInput) 
 		UpdatedAt:    now,
 	}
 	creds := &domain.Credentials{UserID: user.ID, PasswordHash: hash}
+
 	err = r.uow.Do(ctx, func(ctx context.Context) error {
 		if err := r.users.Create(ctx, user); err != nil {
 			return err

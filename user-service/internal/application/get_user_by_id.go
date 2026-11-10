@@ -15,7 +15,7 @@ type GetUserByIDUseCase struct {
 	users outbound.UserRepository
 }
 
-func NewGetUserByIDUseCase(users outbound.UserRepository, uow outbound.UnitOfWork) *GetUserByIDUseCase {
+func NewGetUserByIDUseCase(users outbound.UserRepository) *GetUserByIDUseCase {
 	return &GetUserByIDUseCase{users: users}
 }
 

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -55,4 +56,34 @@ func (r *SessionRepo) DeleteByUserID(ctx context.Context, userID domain.UserID) 
 	db := shareddb.DBFromContext(ctx, r.pool)
 	_, err := db.Exec(ctx, `DELETE FROM sessions WHERE user_id = $1`, userID)
 	return err
+}
+
+const cleanupAdvisoryLockKey int64 = 67 // Уникальный ключ для данной джобы
+
+func (r *SessionRepo) DeleteExpired(ctx context.Context, before time.Time) (n int64, err error) {
+	conn, err := r.pool.Acquire(ctx)
+	if err != nil {
+		return 0, err
+	}
+	defer conn.Release()
+
+	var locked bool
+	if err := conn.QueryRow(ctx, `SELECT pg_try_advisory_lock($1)`,
+		cleanupAdvisoryLockKey).Scan(&locked); err != nil {
+		return 0, err
+	}
+	if !locked {
+		return 0, nil
+	}
+
+	defer func() {
+		// unlock с Background т.к. должен пройти даже при отмене ctx
+		_, _ = conn.Exec(context.Background(), `SELECT pg_advisory_unlock($1)`, cleanupAdvisoryLockKey)
+	}()
+
+	res, err := conn.Exec(ctx, `DELETE FROM sessions WHERE expires_at < $1`, before)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected(), nil
 }

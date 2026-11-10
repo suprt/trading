@@ -11,12 +11,13 @@ import (
 )
 
 type MarketCache struct {
-	client *redis.Client
-	ttl    time.Duration
+	client  *redis.Client
+	ttl     time.Duration
+	lockTTL time.Duration
 }
 
-func NewMarketCache(client *redis.Client, ttl time.Duration) *MarketCache {
-	return &MarketCache{client: client, ttl: ttl}
+func NewMarketCache(client *redis.Client, ttl time.Duration, lockTTL time.Duration) *MarketCache {
+	return &MarketCache{client: client, ttl: ttl, lockTTL: lockTTL}
 }
 
 func (c *MarketCache) GetByID(ctx context.Context, id domain.MarketID) (*domain.Market, error) {
@@ -74,7 +75,7 @@ func (c *MarketCache) InvalidateList(ctx context.Context) error {
 }
 
 func (c *MarketCache) AcquireLock(ctx context.Context) (bool, error) {
-	ok, err := c.client.SetNX(ctx, "markets:lock", "1", 5*time.Second).Result()
+	ok, err := c.client.SetNX(ctx, "markets:lock", "1", c.lockTTL).Result() //TODO: timeout to cfg
 	return ok, err
 }
 

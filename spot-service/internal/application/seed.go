@@ -21,14 +21,6 @@ func NewSeed(markets outbound.MarketRepository, ids outbound.IDGenerator) *Seed 
 }
 
 func (uc *Seed) SeedMarket(ctx context.Context, in dto.SeedMarketInput) error {
-	existing, err := uc.markets.GetByName(ctx, in.Name)
-	if err == nil && existing != nil {
-		return nil
-	}
-	if err != nil && !errors.Is(err, er.ErrMarketNotFound) {
-		return err
-	}
-
 	now := time.Now()
 	m := &domain.Market{
 		ID:            domain.MarketID(uc.ids.New()),
@@ -38,5 +30,11 @@ func (uc *Seed) SeedMarket(ctx context.Context, in dto.SeedMarketInput) error {
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
-	return uc.markets.Create(ctx, m)
-}
+	if err := uc.markets.Create(ctx, m); err != nil {
+		if errors.Is(err, er.ErrMarketNameTaken) {
+			return nil
+		}
+		return err
+	}
+	return nil
+} //TODO: убрать GetByName, Create если ошибка наличия маркета игнор, остальные пробрасываем

@@ -16,11 +16,15 @@ type DBTX interface {
 }
 
 type UoW struct {
-	pool *pgxpool.Pool
+	pool     *pgxpool.Pool
+	reporter ErrorReporter
+}
+type ErrorReporter interface {
+	Report(ctx context.Context, err error, attrs map[string]string)
 }
 
-func NewUoW(pool *pgxpool.Pool) *UoW {
-	return &UoW{pool: pool}
+func NewUoW(pool *pgxpool.Pool, reporter ErrorReporter) *UoW {
+	return &UoW{pool: pool, reporter: reporter}
 }
 
 func (u *UoW) Do(ctx context.Context, fn func(ctx context.Context) error) error {
@@ -28,11 +32,21 @@ func (u *UoW) Do(ctx context.Context, fn func(ctx context.Context) error) error 
 	if err != nil {
 		return err
 	}
+
 	defer func() {
-		if rbErr := tx.Rollback(ctx); rbErr != nil && !errors.Is(rbErr, pgx.ErrTxClosed) {
-			if err == nil {
-				err = rbErr
+		if r := recover(); r != nil {
+			if rbErr := tx.Rollback(context.Background()); rbErr != nil && !errors.Is(rbErr, pgx.ErrTxClosed) {
+				u.reporter.Report(context.Background(), rbErr, map[string]string{
+					"op": "uow_rollback_after_panic",
+				})
 			}
+			panic(r) //пробрасываем панику дальше - panic interceptor поймает и логирует её
+		}
+
+		if rbErr := tx.Rollback(context.Background()); rbErr != nil && !errors.Is(rbErr, pgx.ErrTxClosed) {
+			u.reporter.Report(context.Background(), rbErr, map[string]string{
+				"op": "uow_rollback",
+			})
 		}
 	}()
 
@@ -41,6 +55,7 @@ func (u *UoW) Do(ctx context.Context, fn func(ctx context.Context) error) error 
 	if err := fn(ctx); err != nil {
 		return err
 	}
+	//TODO: recover
 	return tx.Commit(ctx)
 }
 

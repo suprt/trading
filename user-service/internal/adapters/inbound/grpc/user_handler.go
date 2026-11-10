@@ -239,6 +239,6 @@ func (h *Handler) GetUserRoles(ctx context.Context, req *userv1.GetUserRolesRequ
 
 	return &userv1.GetUserRolesResponse{
 		Roles:        roles,
-		RolesVersion: int32(out.RolesVersion),
+		RolesVersion: out.RolesVersion,
 	}, nil
 }

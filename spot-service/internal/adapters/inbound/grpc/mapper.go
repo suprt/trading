@@ -58,12 +58,11 @@ func roleFromProto(r userv1.Role) (domain.Role, error) {
 func rolesFromProto(roles []userv1.Role) ([]domain.Role, error) {
 	result := make([]domain.Role, 0, len(roles))
 	for _, r := range roles {
-		if mapped, err := roleFromProto(r); mapped != "" {
-			if err != nil {
-				return nil, err
-			}
-			result = append(result, mapped)
+		mapped, err := roleFromProto(r) //TODO: err если роль не валидна
+		if err != nil {
+			return nil, err
 		}
+		result = append(result, mapped)
 	}
 	return result, nil
 }

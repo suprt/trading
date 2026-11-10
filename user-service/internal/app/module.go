@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	userv1 "github.com/suprt/trading/proto/user/v1"
 	"github.com/suprt/trading/shared/bootstrap"
+	sharedconfig "github.com/suprt/trading/shared/config"
 	"github.com/suprt/trading/shared/db"
 	"github.com/suprt/trading/shared/idgen"
 	sharedinters "github.com/suprt/trading/shared/interceptors"
@@ -48,6 +48,7 @@ func Module(cfg userconfig.Config) fx.Option {
 					MinConns:        cfg.Postgres.MinConns,
 					MaxConnLifetime: cfg.Postgres.MaxConnLifetime,
 					MaxConnIdleTime: cfg.Postgres.MaxConnIdleTime,
+					ConnectTimeout:  cfg.Timeouts.PostgresConnect,
 				}
 			},
 			db.NewPostgres,
@@ -57,10 +58,11 @@ func Module(cfg userconfig.Config) fx.Option {
 		fx.Provide(
 			func(cfg userconfig.Config) shareredis.Config {
 				return shareredis.Config{
-					Addr:     cfg.Redis.Addr,
-					Username: cfg.Redis.Username,
-					Password: cfg.Redis.Password,
-					DB:       cfg.Redis.DB,
+					Addr:        cfg.Redis.Addr,
+					Username:    cfg.Redis.Username,
+					Password:    cfg.Redis.Password,
+					DB:          cfg.Redis.DB,
+					PingTimeout: cfg.Redis.PingTimeout,
 				}
 			},
 			shareredis.NewClient,
@@ -83,43 +85,14 @@ func Module(cfg userconfig.Config) fx.Option {
 		fx.Provide(zaperror.NewReporter),
 		fx.Provide(func(r *zaperror.Reporter) outbound.ErrorReporter { return r }),
 		fx.Provide(func(r *zaperror.Reporter) sharedinters.ErrorReporter { return r }),
+		fx.Provide(func(r *zaperror.Reporter) shareredis.ErrorReporter { return r }),
+		fx.Provide(func(r *zaperror.Reporter) db.ErrorReporter { return r }),
 
 		// -- Миграции --
 		fx.Invoke(func(lc fx.Lifecycle, cfg userconfig.Config) {
 			lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					return migrations.Up(ctx, cfg.Postgres.DSN)
-				},
-			})
-		}),
-
-		// --Redis ping--
-		fx.Invoke(func(lc fx.Lifecycle, client *redis.Client, logger *zap.Logger) {
-			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-					defer cancel()
-					if err := client.Ping(pingCtx).Err(); err != nil {
-						logger.Warn("redis ping failed, cache disabled", zap.Error(err))
-					}
-					go func() {
-						ticker := time.NewTicker(30 * time.Second)
-						defer ticker.Stop()
-						for {
-							select {
-							case <-ctx.Done():
-								return
-							case <-ticker.C:
-								pingCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-								err := client.Ping(pingCtx).Err()
-								cancel()
-								if err != nil {
-									logger.Warn("redis ping failed", zap.Error(err))
-								}
-							}
-						}
-					}()
-					return nil
 				},
 			})
 		}),
@@ -154,15 +127,15 @@ func Module(cfg userconfig.Config) fx.Option {
 			},
 
 			func(cfg userconfig.Config) sharedinters.RateLimiterConfig {
-				methods := make(map[string]sharedinters.RateLimiterRule, len(cfg.RateLimiter.Methods))
+				methods := make(map[string]sharedconfig.RateLimiterRule, len(cfg.RateLimiter.Methods))
 				for k, v := range cfg.RateLimiter.Methods {
-					methods[k] = sharedinters.RateLimiterRule{
+					methods[k] = sharedconfig.RateLimiterRule{
 						Limit:  v.Limit,
 						Window: v.Window,
 					}
 				}
 				return sharedinters.RateLimiterConfig{
-					Default: sharedinters.RateLimiterRule{
+					Default: sharedconfig.RateLimiterRule{
 						Limit:  cfg.RateLimiter.Default.Limit,
 						Window: cfg.RateLimiter.Default.Window,
 					},
@@ -187,7 +160,7 @@ func Module(cfg userconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					userinters.UnaryAuth(tokens, cfg.Auth.Whitelist, cfg.Internal.Secret),
-					userinters.UnaryValidation(),
+					sharedinters.UnaryValidation(),
 				}
 			},
 		),
@@ -241,6 +214,7 @@ func Module(cfg userconfig.Config) fx.Option {
 			application.NewListUsersUseCase,
 			application.NewGetUserRolesUseCase,
 			application.NewService,
+			application.NewCleanupSessionsUseCase,
 		),
 
 		fx.Provide(
@@ -248,12 +222,17 @@ func Module(cfg userconfig.Config) fx.Option {
 				func(s *application.Service) inbound.UserService { return s },
 			),
 		),
-
+		fx.Provide(
+			fx.Annotate(
+				func(s *application.CleanupSessionsUseCase) SessionCleaner { return s },
+			),
+		),
 		fx.Provide(grpchand.New),
 		fx.Invoke(registerGRPCHandlers),
 
 		fx.Provide(application.NewSeed),
 		fx.Invoke(RunSeeder),
+		fx.Invoke(RunSessionCleaner),
 	)
 }
 func registerGRPCHandlers(srv *grpc.Server, h *grpchand.Handler) {
@@ -295,10 +274,11 @@ func Start() {
 		"log_format", cfg.Log.Format,
 	)
 	bootstrap.NewApp(bootstrap.Options{
-		Addr:        cfg.GRPC.Addr,
-		Modules:     []fx.Option{Module(*cfg)},
-		StopTimeout: cfg.GRPC.StopTimeout,
-		Log:         zapLogger,
+		Addr:         cfg.GRPC.Addr,
+		Modules:      []fx.Option{Module(*cfg)},
+		StopTimeout:  cfg.GRPC.StopTimeout,
+		StartTimeout: cfg.GRPC.StartTimeout,
+		Log:          zapLogger,
 	}).Run()
 	sugar.Info("service stopped")
 }

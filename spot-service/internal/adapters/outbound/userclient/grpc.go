@@ -19,7 +19,7 @@ func NewUserClient(client userv1.UserServiceClient, secret string) *UserClient {
 	return &UserClient{client: client, secret: secret}
 }
 
-func (c *UserClient) GetUserRoles(ctx context.Context, userID domain.UserID) ([]domain.Role, int, error) {
+func (c *UserClient) GetUserRoles(ctx context.Context, userID domain.UserID) ([]domain.Role, int64, error) {
 	ctx = metadata.AppendToOutgoingContext(ctx, "x-internal-secret", c.secret)
 
 	resp, err := c.client.GetUserRoles(ctx, &userv1.GetUserRolesRequest{
@@ -33,5 +33,5 @@ func (c *UserClient) GetUserRoles(ctx context.Context, userID domain.UserID) ([]
 	for i, r := range resp.Roles {
 		roles[i] = domain.Role(strings.TrimPrefix(r.String(), "ROLE_"))
 	}
-	return roles, int(resp.RolesVersion), nil
+	return roles, resp.RolesVersion, nil
 }

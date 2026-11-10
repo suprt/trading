@@ -26,7 +26,7 @@ type IDGenerator interface {
 }
 
 type UserClient interface {
-	GetUserRoles(ctx context.Context, userID domain.UserID) ([]domain.Role, int, error)
+	GetUserRoles(ctx context.Context, userID domain.UserID) ([]domain.Role, int64, error)
 }
 
 type TokenIssuer interface {

@@ -77,7 +77,7 @@ func (Role) EnumDescriptor() ([]byte, []int) {
 
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` //TODO: buf.validate uuid
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	Roles         []Role                 `protobuf:"varint,4,rep,packed,name=roles,proto3,enum=user.v1.Role" json:"roles,omitempty"`
@@ -1434,7 +1434,7 @@ func (x *AdminResetPasswordResponse) GetTemporaryPassword() string {
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` //cursor: base64(created_at + "|" + id)
+	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` //cursor: base64(created_at + "|" + id) TODO: ограничить размер len 256
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1582,7 +1582,7 @@ func (x *GetUserRolesRequest) GetUserId() string {
 type GetUserRolesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Roles         []Role                 `protobuf:"varint,1,rep,packed,name=roles,proto3,enum=user.v1.Role" json:"roles,omitempty"`
-	RolesVersion  int32                  `protobuf:"varint,2,opt,name=roles_version,json=rolesVersion,proto3" json:"roles_version,omitempty"`
+	RolesVersion  int64                  `protobuf:"varint,2,opt,name=roles_version,json=rolesVersion,proto3" json:"roles_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1624,7 +1624,7 @@ func (x *GetUserRolesResponse) GetRoles() []Role {
 	return nil
 }
 
-func (x *GetUserRolesResponse) GetRolesVersion() int32 {
+func (x *GetUserRolesResponse) GetRolesVersion() int64 {
 	if x != nil {
 		return x.RolesVersion
 	}
@@ -1727,7 +1727,7 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x06userId\"`\n" +
 	"\x14GetUserRolesResponse\x12#\n" +
 	"\x05roles\x18\x01 \x03(\x0e2\r.user.v1.RoleR\x05roles\x12#\n" +
-	"\rroles_version\x18\x02 \x01(\x05R\frolesVersion*L\n" +
+	"\rroles_version\x18\x02 \x01(\x03R\frolesVersion*L\n" +
 	"\x04Role\x12\x14\n" +
 	"\x10ROLE_UNSPECIFIED\x10\x00\x12\r\n" +
 	"\tROLE_USER\x10\x01\x12\x0f\n" +

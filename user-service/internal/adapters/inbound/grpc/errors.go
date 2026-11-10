@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"errors"
-	"log"
 
 	er "github.com/suprt/trading/user-service/internal/core/errors"
 	"google.golang.org/grpc/codes"
@@ -29,7 +28,6 @@ func mapErr(err error) error {
 	case errors.Is(err, er.ErrInvalidRole):
 		return status.Error(codes.InvalidArgument, err.Error())
 	default:
-		log.Printf("unhandled error : %v", err)
 		return status.Error(codes.Internal, "internal error")
 	}
 }

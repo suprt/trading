@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "user/v1/user.proto";
 
 message Market {
-  string market_id = 1;
+  string market_id = 1 [(buf.validate.field).string.uuid=true]; //TODO: validate uuid
   string name = 2;
   repeated user.v1.Role required_roles = 3;
   bool enabled = 4;

@@ -13,10 +13,14 @@ type Config struct {
 	MinConns        int32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
+	ConnectTimeout  time.Duration
 }
 
 func NewPostgres(cfg Config) (*pgxpool.Pool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	if cfg.ConnectTimeout <= 0 {
+		cfg.ConnectTimeout = 10 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.ConnectTimeout) //TODO: timeout to cfg
 	defer cancel()
 	poolCfg, err := pgxpool.ParseConfig(cfg.DSN)
 	if err != nil {

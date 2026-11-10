@@ -20,10 +20,11 @@ type Metrics struct {
 }
 
 type Redis struct {
-	Addr     string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
-	Username string `env:"REDIS_USER" envDefault:"redis_user"`
-	Password string `env:"REDIS_PASSWORD"`
-	DB       int    `env:"REDIS_DB" envDefault:"0"`
+	Addr        string        `env:"REDIS_ADDR" envDefault:"localhost:6379"`
+	Username    string        `env:"REDIS_USER" envDefault:"redis_user"`
+	Password    string        `env:"REDIS_PASSWORD"`
+	DB          int           `env:"REDIS_DB" envDefault:"0"`
+	PingTimeout time.Duration `env:"REDIS_PING_TIMEOUT" envDefault:"5s"`
 }
 
 type JWTSecret struct {
