@@ -214,7 +214,6 @@ func Module(cfg userconfig.Config) fx.Option {
 			application.NewListUsersUseCase,
 			application.NewGetUserRolesUseCase,
 			application.NewService,
-			application.NewCleanupSessionsUseCase,
 		),
 
 		fx.Provide(
@@ -222,17 +221,11 @@ func Module(cfg userconfig.Config) fx.Option {
 				func(s *application.Service) inbound.UserService { return s },
 			),
 		),
-		fx.Provide(
-			fx.Annotate(
-				func(s *application.CleanupSessionsUseCase) SessionCleaner { return s },
-			),
-		),
 		fx.Provide(grpchand.New),
 		fx.Invoke(registerGRPCHandlers),
 
 		fx.Provide(application.NewSeed),
 		fx.Invoke(RunSeeder),
-		fx.Invoke(RunSessionCleaner),
 	)
 }
 func registerGRPCHandlers(srv *grpc.Server, h *grpchand.Handler) {

@@ -42,18 +42,11 @@ type Config struct {
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
 	Seed                     Seed `yaml:"seed"`
 	Auth                     Auth `yaml:"auth"`
-	Sessions                 Sessions
 	Timeouts                 Timeouts
-}
-
-type Sessions struct {
-	CleanupEnabled  bool          `env:"SESSIONS_CLEANUP_ENABLED"  envDefault:"true"`
-	CleanupInterval time.Duration `env:"SESSIONS_CLEANUP_INTERVAL" envDefault:"15m"`
 }
 
 type Timeouts struct {
 	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
-	SessionCleanup  time.Duration `env:"TIMEOUT_SESSION_CLEANUP" envDefault:"20s"`
 }
 
 type Idempotency struct {
