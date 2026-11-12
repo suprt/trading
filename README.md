@@ -6,7 +6,7 @@
 
 - [`user-service`](./user-service/README.md) — аутентификация, пользователи, роли
 - [`spot-service`](./spot-service/README.md) — рынки 
-- `order-service` — заказы (в планах)
+- [`order-service`](./order-service/README.md) — заказы 
 - `client` — консольный клиент (в планах)
 
 ## Общая инфраструктура
