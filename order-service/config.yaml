@@ -1,0 +1,11 @@
+rate_limiter:
+  default:
+    limit: 100
+    window: 1m
+  methods:
+    "/order.v1.OrderService/CreateOrder":
+      limit: 30
+      window: 1m
+    "/order.v1.OrderService/CancelOrder":
+      limit: 30
+      window: 1m

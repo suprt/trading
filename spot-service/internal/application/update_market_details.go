@@ -10,6 +10,7 @@ import (
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
 	"github.com/suprt/trading/spot-service/internal/core/ports/outbound"
 )
+
 type UpdateMarketDetailsUseCase struct {
 	markets outbound.MarketRepository
 	users   outbound.UserClient
@@ -19,7 +20,6 @@ type UpdateMarketDetailsUseCase struct {
 func NewUpdateMarketDetailsUseCase(m outbound.MarketRepository, u outbound.UserClient, ids outbound.IDGenerator) *UpdateMarketDetailsUseCase {
 	return &UpdateMarketDetailsUseCase{markets: m, users: u, ids: ids}
 }
-
 
 func (uc *UpdateMarketDetailsUseCase) UpdateMarketDetails(ctx context.Context,
 	in dto.UpdateMarketDetailsInput) (*dto.UpdateMarketDetailsOutput, error) {
@@ -33,7 +33,6 @@ func (uc *UpdateMarketDetailsUseCase) UpdateMarketDetails(ctx context.Context,
 	if !hasAdmin {
 		return nil, er.ErrForbidden
 	}
-
 
 	m, err := uc.markets.GetByID(ctx, in.ID)
 	if err != nil {

@@ -96,10 +96,11 @@ func setupTestServer(t *testing.T) (userv1.UserServiceClient, func()) {
 			"/user.v1.UserService/Register": {Limit: 5, Window: time.Minute},
 		},
 
-		Addr:     redisOpts.Addr,
-		Username: "",
-		Password: "",
-		DB:       0,
+		Addr:        redisOpts.Addr,
+		Username:    "",
+		Password:    "",
+		DB:          0,
+		PingTimeout: 10 * time.Second,
 	}
 
 	// 4. fx.App

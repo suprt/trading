@@ -25,7 +25,7 @@ func (uc *ViewMarketsUseCase) ViewMarkets(ctx context.Context, in dto.ViewMarket
 
 	var result []*domain.Market
 	for _, market := range all {
-		if market.AvailableFor(in.UserRoles){
+		if market.AvailableFor(in.UserRoles) {
 			result = append(result, market)
 		}
 	}

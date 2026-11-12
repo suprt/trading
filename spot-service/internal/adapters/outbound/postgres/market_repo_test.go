@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"github.com/suprt/trading/spot-service/internal/core/domain"
 
 	"github.com/suprt/trading/spot-service/internal/adapters/outbound/postgres"
-	"github.com/suprt/trading/spot-service/internal/core/domain"
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
 )
 

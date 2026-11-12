@@ -6,6 +6,8 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 import "user/v1/user.proto";
 
+option go_package = "github.com/suprt/trading/proto/spot/v1;spot_v1";
+
 message Market {
   string market_id = 1 [(buf.validate.field).string.uuid=true]; //TODO: validate uuid
   string name = 2;
@@ -28,8 +30,8 @@ service SpotInstrumentService {
 
 message ViewMarketsRequest {
   repeated user.v1.Role user_roles = 1 [
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
 }
 message ViewMarketsResponse {
@@ -46,8 +48,8 @@ message GetMarketResponse {
 message CreateMarketRequest {
   string name = 1 [(buf.validate.field).string.min_len = 1];
   repeated user.v1.Role required_roles = 2 [
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
   bool enabled = 3;
 }
@@ -68,8 +70,8 @@ message UpdateMarketDetailsResponse {
 message UpdateMarketRolesRequest {
   string market_id = 1 [(buf.validate.field).string.uuid = true];
   repeated user.v1.Role required_roles = 2 [
-    (buf.validate.field).enum.defined_only = true,
-    (buf.validate.field).enum.not_in = 0
+    (buf.validate.field).repeated.items.enum.defined_only = true,
+    (buf.validate.field).repeated.items.enum.not_in = 0
   ];
 }
 

@@ -1,6 +1,8 @@
 package dto
 
-import "github.com/suprt/trading/spot-service/internal/core/domain"
+import (
+	"github.com/suprt/trading/spot-service/internal/core/domain"
+)
 
 type CreateMarketInput struct {
 	CallerID      domain.UserID

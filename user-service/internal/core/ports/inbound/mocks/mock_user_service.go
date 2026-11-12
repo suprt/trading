@@ -143,6 +143,21 @@ func (mr *MockUserServiceMockRecorder) GetUserByID(ctx, in any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockUserService)(nil).GetUserByID), ctx, in)
 }
 
+// GetUserRoles mocks base method.
+func (m *MockUserService) GetUserRoles(ctx context.Context, in dto.GetUserRolesInput) (*dto.GetUserRolesOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserRoles", ctx, in)
+	ret0, _ := ret[0].(*dto.GetUserRolesOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserRoles indicates an expected call of GetUserRoles.
+func (mr *MockUserServiceMockRecorder) GetUserRoles(ctx, in any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserRoles", reflect.TypeOf((*MockUserService)(nil).GetUserRoles), ctx, in)
+}
+
 // ListUsers mocks base method.
 func (m *MockUserService) ListUsers(ctx context.Context, in dto.ListUsersInput) (*dto.ListUsersOutput, error) {
 	m.ctrl.T.Helper()

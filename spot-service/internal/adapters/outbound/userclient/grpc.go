@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
+	"github.com/suprt/trading/spot-service/internal/core/domain"
 	"google.golang.org/grpc/metadata"
 
 	userv1 "github.com/suprt/trading/proto/user/v1"
-	"github.com/suprt/trading/spot-service/internal/core/domain"
 )
 
 type UserClient struct {

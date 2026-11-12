@@ -14,8 +14,7 @@ import (
 
 func setupGetUserByIDTest() (*mockUserRepo, *application.GetUserByIDUseCase) {
 	users := newMockUserRepo()
-	uow := &mockUoW{}
-	uc := application.NewGetUserByIDUseCase(users, uow)
+	uc := application.NewGetUserByIDUseCase(users)
 	return users, uc
 }
 

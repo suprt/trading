@@ -6,12 +6,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	spotv1 "github.com/suprt/trading/proto/spot/v1"
+	userv1 "github.com/suprt/trading/proto/user/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	spotv1 "github.com/suprt/trading/proto/spot/v1"
-	userv1 "github.com/suprt/trading/proto/user/v1"
 )
 
 // authCtx — эмулирует наличие токена (для прохождения Auth интерсептора).
@@ -59,7 +58,7 @@ func TestE2E_CreateMarket_Success(t *testing.T) {
 
 	out, err := client.CreateMarket(ctx, &spotv1.CreateMarketRequest{
 		Name:          "NEW/USDT",
-		RequiredRoles: []userv1.Role{userv1.Role_ROLE_USER},
+		RequiredRoles: []userv1.Role{userv1.Role_ROLE_USER, userv1.Role_ROLE_ADMIN},
 		Enabled:       true,
 	})
 	require.NoError(t, err)

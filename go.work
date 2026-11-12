@@ -6,4 +6,5 @@ use (
 	./user-service
 	./client
 	./spot-service
+	./order-service
 )

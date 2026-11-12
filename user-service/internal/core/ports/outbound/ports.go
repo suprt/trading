@@ -26,7 +26,6 @@ type SessionRepository interface {
 	GetByToken(ctx context.Context, token domain.RefreshToken) (*domain.RefreshSession, error)
 	Delete(ctx context.Context, t domain.RefreshToken) error
 	DeleteByUserID(ctx context.Context, userID domain.UserID) error
-	DeleteExpired(ctx context.Context, before time.Time) (int64, error)
 }
 
 type PasswordHasher interface {

@@ -6,8 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/suprt/trading/spot-service/internal/application"
 	"github.com/suprt/trading/spot-service/internal/core/domain"
+
+	"github.com/suprt/trading/spot-service/internal/application"
 	"github.com/suprt/trading/spot-service/internal/core/dto"
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
 )

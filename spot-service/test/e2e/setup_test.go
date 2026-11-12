@@ -34,7 +34,7 @@ type fakeUserClient struct {
 	roles []string
 }
 
-func (f *fakeUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int, error) {
+func (f *fakeUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int64, error) {
 	roles := make([]domain.Role, len(f.roles))
 	for i, r := range f.roles {
 		roles[i] = domain.Role(r)
@@ -68,7 +68,6 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
 	require.NoError(t, err)
 
-
 	// Redis
 	redisContainer, err := tcredis.Run(ctx, "redis:8-alpine")
 	require.NoError(t, err)
@@ -95,10 +94,11 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 			MaxConnLifetime: time.Minute,
 			MaxConnIdleTime: time.Minute,
 		},
-		Addr:     redisOpts.Addr,
-		Username: "",
-		Password: "",
-		DB:       0,
+		Addr:        redisOpts.Addr,
+		Username:    "",
+		Password:    "",
+		DB:          0,
+		PingTimeout: 10 * time.Second,
 		JWT: spotconfig.JWT{
 			Secret: "test-secret",
 		},

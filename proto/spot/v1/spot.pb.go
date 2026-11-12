@@ -776,9 +776,9 @@ var File_spot_v1_spot_proto protoreflect.FileDescriptor
 
 const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
-	"\x12spot/v1/spot.proto\x12\aspot.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12user/v1/user.proto\"\xba\x02\n" +
-	"\x06Market\x12\x1b\n" +
-	"\tmarket_id\x18\x01 \x01(\tR\bmarketId\x12\x12\n" +
+	"\x12spot/v1/spot.proto\x12\aspot.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x12user/v1/user.proto\"\xc4\x02\n" +
+	"\x06Market\x12%\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x124\n" +
 	"\x0erequired_roles\x18\x03 \x03(\x0e2\r.user.v1.RoleR\rrequiredRoles\x12\x18\n" +
 	"\aenabled\x18\x04 \x01(\bR\aenabled\x129\n" +
@@ -787,21 +787,19 @@ const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"deleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"N\n" +
-	"\x12ViewMarketsRequest\x128\n" +
+	"deleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"S\n" +
+	"\x12ViewMarketsRequest\x12=\n" +
 	"\n" +
-	"user_roles\x18\x01 \x03(\x0e2\r.user.v1.RoleB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\tuserRoles\"@\n" +
+	"user_roles\x18\x01 \x03(\x0e2\r.user.v1.RoleB\x0f\xbaH\f\x92\x01\t\"\a\x82\x01\x04\x10\x01 \x00R\tuserRoles\"@\n" +
 	"\x13ViewMarketsResponse\x12)\n" +
 	"\amarkets\x18\x01 \x03(\v2\x0f.spot.v1.MarketR\amarkets\"9\n" +
 	"\x10GetMarketRequest\x12%\n" +
 	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\"<\n" +
 	"\x11GetMarketResponse\x12'\n" +
-	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x8e\x01\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x93\x01\n" +
 	"\x13CreateMarketRequest\x12\x1b\n" +
-	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12@\n" +
-	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\x12\x18\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12E\n" +
+	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\x0f\xbaH\f\x92\x01\t\"\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\x12\x18\n" +
 	"\aenabled\x18\x03 \x01(\bR\aenabled\"?\n" +
 	"\x14CreateMarketResponse\x12'\n" +
 	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x99\x01\n" +
@@ -813,11 +811,10 @@ const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
 	"\b_enabled\"F\n" +
 	"\x1bUpdateMarketDetailsResponse\x12'\n" +
-	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x83\x01\n" +
+	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"\x88\x01\n" +
 	"\x18UpdateMarketRolesRequest\x12%\n" +
-	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\x12@\n" +
-	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\n" +
-	"\xbaH\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\"D\n" +
+	"\tmarket_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\bmarketId\x12E\n" +
+	"\x0erequired_roles\x18\x02 \x03(\x0e2\r.user.v1.RoleB\x0f\xbaH\f\x92\x01\t\"\a\x82\x01\x04\x10\x01 \x00R\rrequiredRoles\"D\n" +
 	"\x19UpdateMarketRolesResponse\x12'\n" +
 	"\x06market\x18\x01 \x01(\v2\x0f.spot.v1.MarketR\x06market\"<\n" +
 	"\x13DeleteMarketRequest\x12%\n" +

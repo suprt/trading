@@ -37,7 +37,29 @@ services:
       user-service:
         condition: service_started
     restart: unless-stopped
-
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: trading-order-service
+    ports:
+      - "50053:50053"
+    env_file:
+      - order-service/.env
+    environment:
+      POSTGRES_DSN: "postgres://trading:trading@postgres-order:5432/order_db?sslmode=disable"
+      USER_SERVICE_ADDR: "user-service:50051"
+      SPOT_SERVICE_ADDR: "spot-service:50052"
+    depends_on:
+      postgres-order:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      spot-service:
+        condition: service_started
+    restart: unless-stopped
   redis:
     image: redis:8.10.2-alpine
     command: >

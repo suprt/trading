@@ -1635,9 +1635,9 @@ var File_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12user/v1/user.proto\x12\auser.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x88\x02\n" +
-	"\x04User\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x12user/v1/user.proto\x12\auser.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x92\x02\n" +
+	"\x04User\x12\x18\n" +
+	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12#\n" +
 	"\x05roles\x18\x04 \x03(\x0e2\r.user.v1.RoleR\x05roles\x12#\n" +
@@ -1715,11 +1715,11 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\x19AdminResetPasswordRequest\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x06userId\"K\n" +
 	"\x1aAdminResetPasswordResponse\x12-\n" +
-	"\x12temporary_password\x18\x01 \x01(\tR\x11temporaryPassword\"Y\n" +
+	"\x12temporary_password\x18\x01 \x01(\tR\x11temporaryPassword\"c\n" +
 	"\x10ListUsersRequest\x12&\n" +
-	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01R\bpageSize\x12\x1d\n" +
+	"\tpage_size\x18\x01 \x01(\x05B\t\xbaH\x06\x1a\x04\x18d(\x01R\bpageSize\x12'\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\tR\tpageToken\"`\n" +
+	"page_token\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\x80\x02R\tpageToken\"`\n" +
 	"\x11ListUsersResponse\x12#\n" +
 	"\x05users\x18\x01 \x03(\v2\r.user.v1.UserR\x05users\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"8\n" +

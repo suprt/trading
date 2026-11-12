@@ -17,7 +17,7 @@ type mockUserClient struct {
 	err   error
 }
 
-func (m *mockUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int, error) {
+func (m *mockUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int64, error) {
 	return m.roles, 1, m.err
 }
 

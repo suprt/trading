@@ -3,10 +3,10 @@ package app
 import (
 	"context"
 
+	"github.com/suprt/trading/spot-service/internal/core/domain"
 	"go.uber.org/fx"
 
 	"github.com/suprt/trading/spot-service/internal/application"
-	"github.com/suprt/trading/spot-service/internal/core/domain"
 	"github.com/suprt/trading/spot-service/internal/core/dto"
 	"github.com/suprt/trading/spot-service/internal/infrastructure/config"
 )
