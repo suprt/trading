@@ -133,43 +133,6 @@ func TestOrderRepo_Cancel_Admin(t *testing.T) {
 	require.Equal(t, domain.OrderStatusCancelled, cancelled.Status)
 }
 
-func TestOrderRepo_ListByUser_Pagination(t *testing.T) {
-	pool, cleanup := setupPostgres(t)
-	defer cleanup()
-
-	repo := postgres.NewOrderRepo(pool)
-	ctx := context.Background()
-
-	userID := domain.UserID("00000000-0000-0000-0000-000000000001")
-	base := time.Now().Add(-time.Hour)
-
-	// 3 заказа этого юзера + 1 чужой
-	for i := 0; i < 3; i++ {
-		o := newOrder(func(o *domain.Order) {
-			o.UserID = userID
-			o.CreatedAt = base.Add(time.Duration(i) * time.Minute)
-			o.UpdatedAt = o.CreatedAt
-		})
-		require.NoError(t, repo.Create(ctx, o))
-	}
-	other := newOrder(nil)
-	require.NoError(t, repo.Create(ctx, other))
-
-	// первая страница: 2 заказа
-	page1, err := repo.ListByUser(ctx, userID, 2, time.Time{}, "")
-	require.NoError(t, err)
-	require.Len(t, page1, 2)
-
-	// вторая страница: 1 заказ (после последнего из page1)
-	last := page1[len(page1)-1]
-	page2, err := repo.ListByUser(ctx, userID, 2, last.CreatedAt, last.ID)
-	require.NoError(t, err)
-	require.Len(t, page2, 1)
-
-	// все заказы — только этого юзера
-	require.NotContains(t, orderIDs(page1, page2), other.ID)
-}
-
 func TestOrderRepo_ListAll_FilterAndPagination(t *testing.T) {
 	pool, cleanup := setupPostgres(t)
 	defer cleanup()

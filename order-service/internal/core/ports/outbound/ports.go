@@ -12,7 +12,6 @@ type OrderRepository interface {
 	GetByID(ctx context.Context, id domain.OrderID) (*domain.Order, error)
 	// Cancel возвращает (order, true, nil) при успехе, (nil, false, nil) если строка не обновлена.
 	Cancel(ctx context.Context, id domain.OrderID, userID *domain.UserID, now time.Time) (*domain.Order, bool, error)
-	ListByUser(ctx context.Context, userID domain.UserID, limit int, afterCreatedAt time.Time, afterID domain.OrderID) ([]*domain.Order, error)
 	ListAll(ctx context.Context, userID *domain.UserID, limit int, afterCreatedAt time.Time, afterID domain.OrderID) ([]*domain.Order, error)
 }
 

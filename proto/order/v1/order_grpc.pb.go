@@ -19,15 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrderService_CreateOrder_FullMethodName         = "/order.v1.OrderService/CreateOrder"
-	OrderService_GetOrder_FullMethodName            = "/order.v1.OrderService/GetOrder"
-	OrderService_GetOrderStatus_FullMethodName      = "/order.v1.OrderService/GetOrderStatus"
-	OrderService_AdminGetOrder_FullMethodName       = "/order.v1.OrderService/AdminGetOrder"
-	OrderService_AdminGetOrderStatus_FullMethodName = "/order.v1.OrderService/AdminGetOrderStatus"
-	OrderService_CancelOrder_FullMethodName         = "/order.v1.OrderService/CancelOrder"
-	OrderService_AdminCancelOrder_FullMethodName    = "/order.v1.OrderService/AdminCancelOrder"
-	OrderService_ListOrders_FullMethodName          = "/order.v1.OrderService/ListOrders"
-	OrderService_AdminListOrders_FullMethodName     = "/order.v1.OrderService/AdminListOrders"
+	OrderService_CreateOrder_FullMethodName    = "/order.v1.OrderService/CreateOrder"
+	OrderService_GetOrder_FullMethodName       = "/order.v1.OrderService/GetOrder"
+	OrderService_GetOrderStatus_FullMethodName = "/order.v1.OrderService/GetOrderStatus"
+	OrderService_CancelOrder_FullMethodName    = "/order.v1.OrderService/CancelOrder"
+	OrderService_ListOrders_FullMethodName     = "/order.v1.OrderService/ListOrders"
 )
 
 // OrderServiceClient is the client API for OrderService service.
@@ -37,12 +33,8 @@ type OrderServiceClient interface {
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 	GetOrderStatus(ctx context.Context, in *GetOrderStatusRequest, opts ...grpc.CallOption) (*GetOrderStatusResponse, error)
-	AdminGetOrder(ctx context.Context, in *AdminGetOrderRequest, opts ...grpc.CallOption) (*AdminGetOrderResponse, error)
-	AdminGetOrderStatus(ctx context.Context, in *AdminGetOrderStatusRequest, opts ...grpc.CallOption) (*AdminGetOrderStatusResponse, error)
 	CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*CancelOrderResponse, error)
-	AdminCancelOrder(ctx context.Context, in *AdminCancelOrderRequest, opts ...grpc.CallOption) (*AdminCancelOrderResponse, error)
 	ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersResponse, error)
-	AdminListOrders(ctx context.Context, in *AdminListOrdersRequest, opts ...grpc.CallOption) (*AdminListOrdersResponse, error)
 }
 
 type orderServiceClient struct {
@@ -83,40 +75,10 @@ func (c *orderServiceClient) GetOrderStatus(ctx context.Context, in *GetOrderSta
 	return out, nil
 }
 
-func (c *orderServiceClient) AdminGetOrder(ctx context.Context, in *AdminGetOrderRequest, opts ...grpc.CallOption) (*AdminGetOrderResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AdminGetOrderResponse)
-	err := c.cc.Invoke(ctx, OrderService_AdminGetOrder_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *orderServiceClient) AdminGetOrderStatus(ctx context.Context, in *AdminGetOrderStatusRequest, opts ...grpc.CallOption) (*AdminGetOrderStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AdminGetOrderStatusResponse)
-	err := c.cc.Invoke(ctx, OrderService_AdminGetOrderStatus_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *orderServiceClient) CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*CancelOrderResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CancelOrderResponse)
 	err := c.cc.Invoke(ctx, OrderService_CancelOrder_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *orderServiceClient) AdminCancelOrder(ctx context.Context, in *AdminCancelOrderRequest, opts ...grpc.CallOption) (*AdminCancelOrderResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AdminCancelOrderResponse)
-	err := c.cc.Invoke(ctx, OrderService_AdminCancelOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,16 +95,6 @@ func (c *orderServiceClient) ListOrders(ctx context.Context, in *ListOrdersReque
 	return out, nil
 }
 
-func (c *orderServiceClient) AdminListOrders(ctx context.Context, in *AdminListOrdersRequest, opts ...grpc.CallOption) (*AdminListOrdersResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AdminListOrdersResponse)
-	err := c.cc.Invoke(ctx, OrderService_AdminListOrders_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // OrderServiceServer is the server API for OrderService service.
 // All implementations must embed UnimplementedOrderServiceServer
 // for forward compatibility.
@@ -150,12 +102,8 @@ type OrderServiceServer interface {
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	GetOrderStatus(context.Context, *GetOrderStatusRequest) (*GetOrderStatusResponse, error)
-	AdminGetOrder(context.Context, *AdminGetOrderRequest) (*AdminGetOrderResponse, error)
-	AdminGetOrderStatus(context.Context, *AdminGetOrderStatusRequest) (*AdminGetOrderStatusResponse, error)
 	CancelOrder(context.Context, *CancelOrderRequest) (*CancelOrderResponse, error)
-	AdminCancelOrder(context.Context, *AdminCancelOrderRequest) (*AdminCancelOrderResponse, error)
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
-	AdminListOrders(context.Context, *AdminListOrdersRequest) (*AdminListOrdersResponse, error)
 	mustEmbedUnimplementedOrderServiceServer()
 }
 
@@ -175,23 +123,11 @@ func (UnimplementedOrderServiceServer) GetOrder(context.Context, *GetOrderReques
 func (UnimplementedOrderServiceServer) GetOrderStatus(context.Context, *GetOrderStatusRequest) (*GetOrderStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOrderStatus not implemented")
 }
-func (UnimplementedOrderServiceServer) AdminGetOrder(context.Context, *AdminGetOrderRequest) (*AdminGetOrderResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method AdminGetOrder not implemented")
-}
-func (UnimplementedOrderServiceServer) AdminGetOrderStatus(context.Context, *AdminGetOrderStatusRequest) (*AdminGetOrderStatusResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method AdminGetOrderStatus not implemented")
-}
 func (UnimplementedOrderServiceServer) CancelOrder(context.Context, *CancelOrderRequest) (*CancelOrderResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CancelOrder not implemented")
 }
-func (UnimplementedOrderServiceServer) AdminCancelOrder(context.Context, *AdminCancelOrderRequest) (*AdminCancelOrderResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method AdminCancelOrder not implemented")
-}
 func (UnimplementedOrderServiceServer) ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListOrders not implemented")
-}
-func (UnimplementedOrderServiceServer) AdminListOrders(context.Context, *AdminListOrdersRequest) (*AdminListOrdersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method AdminListOrders not implemented")
 }
 func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
 func (UnimplementedOrderServiceServer) testEmbeddedByValue()                      {}
@@ -268,42 +204,6 @@ func _OrderService_GetOrderStatus_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrderService_AdminGetOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AdminGetOrderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).AdminGetOrder(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_AdminGetOrder_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AdminGetOrder(ctx, req.(*AdminGetOrderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _OrderService_AdminGetOrderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AdminGetOrderStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).AdminGetOrderStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_AdminGetOrderStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AdminGetOrderStatus(ctx, req.(*AdminGetOrderStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _OrderService_CancelOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CancelOrderRequest)
 	if err := dec(in); err != nil {
@@ -322,24 +222,6 @@ func _OrderService_CancelOrder_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _OrderService_AdminCancelOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AdminCancelOrderRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).AdminCancelOrder(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_AdminCancelOrder_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AdminCancelOrder(ctx, req.(*AdminCancelOrderRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _OrderService_ListOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListOrdersRequest)
 	if err := dec(in); err != nil {
@@ -354,24 +236,6 @@ func _OrderService_ListOrders_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OrderServiceServer).ListOrders(ctx, req.(*ListOrdersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _OrderService_AdminListOrders_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AdminListOrdersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(OrderServiceServer).AdminListOrders(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: OrderService_AdminListOrders_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServiceServer).AdminListOrders(ctx, req.(*AdminListOrdersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -396,28 +260,12 @@ var OrderService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _OrderService_GetOrderStatus_Handler,
 		},
 		{
-			MethodName: "AdminGetOrder",
-			Handler:    _OrderService_AdminGetOrder_Handler,
-		},
-		{
-			MethodName: "AdminGetOrderStatus",
-			Handler:    _OrderService_AdminGetOrderStatus_Handler,
-		},
-		{
 			MethodName: "CancelOrder",
 			Handler:    _OrderService_CancelOrder_Handler,
 		},
 		{
-			MethodName: "AdminCancelOrder",
-			Handler:    _OrderService_AdminCancelOrder_Handler,
-		},
-		{
 			MethodName: "ListOrders",
 			Handler:    _OrderService_ListOrders_Handler,
-		},
-		{
-			MethodName: "AdminListOrders",
-			Handler:    _OrderService_AdminListOrders_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

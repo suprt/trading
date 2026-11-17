@@ -8,6 +8,7 @@ import (
 	"buf.build/go/protovalidate"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
+	orderinters "github.com/suprt/trading/order-service/internal/adapters/inbound/interceptors"
 	sharedconfig "github.com/suprt/trading/shared/config"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -16,7 +17,6 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	grpchand "github.com/suprt/trading/order-service/internal/adapters/inbound/grpc"
-	orderinters "github.com/suprt/trading/order-service/internal/adapters/inbound/interceptors"
 	orderjwt "github.com/suprt/trading/order-service/internal/adapters/outbound/jwt"
 	"github.com/suprt/trading/order-service/internal/adapters/outbound/postgres"
 	"github.com/suprt/trading/order-service/internal/adapters/outbound/spotclient"
@@ -37,6 +37,14 @@ import (
 	shareredis "github.com/suprt/trading/shared/redis"
 	"github.com/suprt/trading/shared/zaperror"
 )
+
+var defaultAdminMethods = map[string]struct{}{
+	"/order.v1.OrderService/CreateOrder":    {},
+	"/order.v1.OrderService/GetOrder":       {},
+	"/order.v1.OrderService/GetOrderStatus": {},
+	"/order.v1.OrderService/CancelOrder":    {},
+	"/order.v1.OrderService/ListOrders":     {},
+}
 
 func Module(cfg orderconfig.Config) fx.Option {
 	return fx.Module("order",
@@ -115,25 +123,35 @@ func Module(cfg orderconfig.Config) fx.Option {
 			},
 		),
 		// -- Validator
-		fx.Provide(protovalidate.New()),
+		fx.Provide(protovalidate.New),
 
+		fx.Provide(func(cfg orderconfig.Config) map[string]struct{} {
+			if len(cfg.Admin.Methods) == 0 {
+				return defaultAdminMethods
+			}
+			return cfg.Admin.Methods
+		}),
 		// --- Interceptors ---
 		fx.Provide(
+
 			func(
 				logger *zap.Logger,
 				tokens outbound.TokenIssuer,
 				redisClient *redis.Client,
+				userClient outbound.UserClient,
 				rlCfg sharedinters.RateLimiterConfig,
 				errReporter outbound.ErrorReporter,
 				validator protovalidate.Validator,
+				adminCfg map[string]struct{},
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
 					sharedinters.XRequestID(),
 					sharedinters.Logger(logger),
-					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					orderinters.UnaryAuth(tokens),
+					orderinters.UnaryAdmin(userClient, adminCfg),
 					sharedinters.UnaryValidation(validator),
+					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 				}
 			},
 		),
@@ -183,12 +201,8 @@ func Module(cfg orderconfig.Config) fx.Option {
 			application.NewCreateOrderUseCase,
 			application.NewGetOrderUseCase,
 			application.NewGetOrderStatusUseCase,
-			application.NewAdminGetOrderUseCase,
-			application.NewAdminGetOrderStatusUseCase,
 			application.NewCancelOrderUseCase,
-			application.NewAdminCancelOrderUseCase,
 			application.NewListOrdersUseCase,
-			application.NewAdminListOrdersUseCase,
 			application.NewService,
 		),
 

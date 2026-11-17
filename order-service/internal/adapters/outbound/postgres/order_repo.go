@@ -80,34 +80,6 @@ func (r *OrderRepo) Cancel(ctx context.Context, id domain.OrderID, userID *domai
 	return o, true, nil
 }
 
-func (r *OrderRepo) ListByUser(ctx context.Context, userID domain.UserID, limit int,
-	afterCreatedAt time.Time, afterID domain.OrderID) ([]*domain.Order, error) {
-	db := shareddb.DBFromContext(ctx, r.pool)
-	var rows pgx.Rows
-	var err error
-
-	if afterID == "" {
-		rows, err = db.Query(ctx, `
-			SELECT `+orderColumns+`
-			FROM orders
-			WHERE user_id = $1
-			ORDER BY created_at DESC, id DESC
-			LIMIT $2`, userID, limit)
-	} else {
-		rows, err = db.Query(ctx, `
-			SELECT `+orderColumns+`
-			FROM orders
-			WHERE user_id = $1 AND (created_at, id) < ($2, $3)
-			ORDER BY created_at DESC, id DESC
-			LIMIT $4`, userID, afterCreatedAt, afterID, limit)
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	return collectOrders(rows)
-}
-
 func (r *OrderRepo) ListAll(ctx context.Context, userID *domain.UserID, limit int,
 	afterCreatedAt time.Time, afterID domain.OrderID) ([]*domain.Order, error) {
 	db := shareddb.DBFromContext(ctx, r.pool)

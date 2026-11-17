@@ -1,6 +1,5 @@
 auth:
   whitelist:
-    "/spot.v1.SpotInstrumentService/ViewMarkets": {}
     "/spot.v1.SpotInstrumentService/GetMarket": {}
 
 seed:

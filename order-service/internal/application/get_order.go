@@ -27,7 +27,7 @@ func (uc *GetOrderUseCase) GetOrder(ctx context.Context, in dto.GetOrderInput) (
 	if err != nil {
 		return nil, err
 	}
-	if order.UserID != callerID {
+	if order.UserID != callerID && !auth.IsAdminFromContext(ctx) {
 		return nil, er.ErrForbidden
 	}
 	return &dto.GetOrderOutput{Order: order}, nil

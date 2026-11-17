@@ -41,66 +41,6 @@ func (m *MockOrderService) EXPECT() *MockOrderServiceMockRecorder {
 	return m.recorder
 }
 
-// AdminCancelOrder mocks base method.
-func (m *MockOrderService) AdminCancelOrder(ctx context.Context, in dto.AdminCancelOrderInput) (*dto.AdminCancelOrderOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AdminCancelOrder", ctx, in)
-	ret0, _ := ret[0].(*dto.AdminCancelOrderOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AdminCancelOrder indicates an expected call of AdminCancelOrder.
-func (mr *MockOrderServiceMockRecorder) AdminCancelOrder(ctx, in any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminCancelOrder", reflect.TypeOf((*MockOrderService)(nil).AdminCancelOrder), ctx, in)
-}
-
-// AdminGetOrder mocks base method.
-func (m *MockOrderService) AdminGetOrder(ctx context.Context, in dto.AdminGetOrderInput) (*dto.AdminGetOrderOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AdminGetOrder", ctx, in)
-	ret0, _ := ret[0].(*dto.AdminGetOrderOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AdminGetOrder indicates an expected call of AdminGetOrder.
-func (mr *MockOrderServiceMockRecorder) AdminGetOrder(ctx, in any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminGetOrder", reflect.TypeOf((*MockOrderService)(nil).AdminGetOrder), ctx, in)
-}
-
-// AdminGetOrderStatus mocks base method.
-func (m *MockOrderService) AdminGetOrderStatus(ctx context.Context, in dto.AdminGetOrderStatusInput) (*dto.AdminGetOrderStatusOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AdminGetOrderStatus", ctx, in)
-	ret0, _ := ret[0].(*dto.AdminGetOrderStatusOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AdminGetOrderStatus indicates an expected call of AdminGetOrderStatus.
-func (mr *MockOrderServiceMockRecorder) AdminGetOrderStatus(ctx, in any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminGetOrderStatus", reflect.TypeOf((*MockOrderService)(nil).AdminGetOrderStatus), ctx, in)
-}
-
-// AdminListOrders mocks base method.
-func (m *MockOrderService) AdminListOrders(ctx context.Context, in dto.AdminListOrdersInput) (*dto.AdminListOrdersOutput, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AdminListOrders", ctx, in)
-	ret0, _ := ret[0].(*dto.AdminListOrdersOutput)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AdminListOrders indicates an expected call of AdminListOrders.
-func (mr *MockOrderServiceMockRecorder) AdminListOrders(ctx, in any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminListOrders", reflect.TypeOf((*MockOrderService)(nil).AdminListOrders), ctx, in)
-}
-
 // CancelOrder mocks base method.
 func (m *MockOrderService) CancelOrder(ctx context.Context, in dto.CancelOrderInput) (*dto.CancelOrderOutput, error) {
 	m.ctrl.T.Helper()

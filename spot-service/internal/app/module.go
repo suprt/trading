@@ -141,7 +141,7 @@ func Module(cfg spotconfig.Config) fx.Option {
 			},
 		),
 		// -- Validator
-		fx.Provide(protovalidate.New()),
+		fx.Provide(protovalidate.New),
 
 		// --- Interceptors ---
 		fx.Provide(

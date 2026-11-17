@@ -29,10 +29,7 @@ service SpotInstrumentService {
 }
 
 message ViewMarketsRequest {
-  repeated user.v1.Role user_roles = 1 [
-    (buf.validate.field).repeated.items.enum.defined_only = true,
-    (buf.validate.field).repeated.items.enum.not_in = 0
-  ];
+
 }
 message ViewMarketsResponse {
   repeated Market markets = 1;

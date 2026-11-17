@@ -4,9 +4,19 @@ import (
 	"context"
 	"time"
 
+	"github.com/suprt/trading/order-service/internal/core/auth"
 	"github.com/suprt/trading/order-service/internal/core/domain"
 	er "github.com/suprt/trading/order-service/internal/core/errors"
 )
+
+func ctxWithUser(id domain.UserID) context.Context {
+	return auth.WithUserID(context.Background(), id)
+}
+
+func ctxWithAdmin(id domain.UserID) context.Context {
+	ctx := auth.WithUserID(context.Background(), id)
+	return auth.WithIsAdmin(ctx, true)
+}
 
 // ==========================================
 // MockOrderRepo
@@ -47,17 +57,6 @@ func (m *mockOrderRepo) Cancel(_ context.Context, id domain.OrderID, userID *dom
 	o.Status = domain.OrderStatusCancelled
 	o.UpdatedAt = now
 	return o, true, nil
-}
-
-func (m *mockOrderRepo) ListByUser(_ context.Context, userID domain.UserID, limit int,
-	_ time.Time, _ domain.OrderID) ([]*domain.Order, error) {
-	var result []*domain.Order
-	for _, o := range m.orders {
-		if o.UserID == userID {
-			result = append(result, o)
-		}
-	}
-	return result, nil
 }
 
 func (m *mockOrderRepo) ListAll(_ context.Context, userID *domain.UserID, limit int,

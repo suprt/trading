@@ -26,7 +26,7 @@ const (
 
 type Market struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"` //TODO: validate uuid
+	MarketId      string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	RequiredRoles []v1.Role              `protobuf:"varint,3,rep,packed,name=required_roles,json=requiredRoles,proto3,enum=user.v1.Role" json:"required_roles,omitempty"`
 	Enabled       bool                   `protobuf:"varint,4,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -118,7 +118,6 @@ func (x *Market) GetDeletedAt() *timestamppb.Timestamp {
 
 type ViewMarketsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserRoles     []v1.Role              `protobuf:"varint,1,rep,packed,name=user_roles,json=userRoles,proto3,enum=user.v1.Role" json:"user_roles,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -151,13 +150,6 @@ func (x *ViewMarketsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ViewMarketsRequest.ProtoReflect.Descriptor instead.
 func (*ViewMarketsRequest) Descriptor() ([]byte, []int) {
 	return file_spot_v1_spot_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ViewMarketsRequest) GetUserRoles() []v1.Role {
-	if x != nil {
-		return x.UserRoles
-	}
-	return nil
 }
 
 type ViewMarketsResponse struct {
@@ -787,10 +779,8 @@ const file_spot_v1_spot_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"deleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"S\n" +
-	"\x12ViewMarketsRequest\x12=\n" +
-	"\n" +
-	"user_roles\x18\x01 \x03(\x0e2\r.user.v1.RoleB\x0f\xbaH\f\x92\x01\t\"\a\x82\x01\x04\x10\x01 \x00R\tuserRoles\"@\n" +
+	"deleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\x14\n" +
+	"\x12ViewMarketsRequest\"@\n" +
 	"\x13ViewMarketsResponse\x12)\n" +
 	"\amarkets\x18\x01 \x03(\v2\x0f.spot.v1.MarketR\amarkets\"9\n" +
 	"\x10GetMarketRequest\x12%\n" +
@@ -872,34 +862,33 @@ var file_spot_v1_spot_proto_depIdxs = []int32{
 	16, // 1: spot.v1.Market.created_at:type_name -> google.protobuf.Timestamp
 	16, // 2: spot.v1.Market.updated_at:type_name -> google.protobuf.Timestamp
 	16, // 3: spot.v1.Market.deleted_at:type_name -> google.protobuf.Timestamp
-	15, // 4: spot.v1.ViewMarketsRequest.user_roles:type_name -> user.v1.Role
-	0,  // 5: spot.v1.ViewMarketsResponse.markets:type_name -> spot.v1.Market
-	0,  // 6: spot.v1.GetMarketResponse.market:type_name -> spot.v1.Market
-	15, // 7: spot.v1.CreateMarketRequest.required_roles:type_name -> user.v1.Role
-	0,  // 8: spot.v1.CreateMarketResponse.market:type_name -> spot.v1.Market
-	0,  // 9: spot.v1.UpdateMarketDetailsResponse.market:type_name -> spot.v1.Market
-	15, // 10: spot.v1.UpdateMarketRolesRequest.required_roles:type_name -> user.v1.Role
-	0,  // 11: spot.v1.UpdateMarketRolesResponse.market:type_name -> spot.v1.Market
-	0,  // 12: spot.v1.ListAllMarketsResponse.markets:type_name -> spot.v1.Market
-	1,  // 13: spot.v1.SpotInstrumentService.ViewMarkets:input_type -> spot.v1.ViewMarketsRequest
-	3,  // 14: spot.v1.SpotInstrumentService.GetMarket:input_type -> spot.v1.GetMarketRequest
-	5,  // 15: spot.v1.SpotInstrumentService.CreateMarket:input_type -> spot.v1.CreateMarketRequest
-	7,  // 16: spot.v1.SpotInstrumentService.UpdateMarketDetails:input_type -> spot.v1.UpdateMarketDetailsRequest
-	9,  // 17: spot.v1.SpotInstrumentService.UpdateMarketRoles:input_type -> spot.v1.UpdateMarketRolesRequest
-	11, // 18: spot.v1.SpotInstrumentService.DeleteMarket:input_type -> spot.v1.DeleteMarketRequest
-	13, // 19: spot.v1.SpotInstrumentService.ListAllMarkets:input_type -> spot.v1.ListAllMarketsRequest
-	2,  // 20: spot.v1.SpotInstrumentService.ViewMarkets:output_type -> spot.v1.ViewMarketsResponse
-	4,  // 21: spot.v1.SpotInstrumentService.GetMarket:output_type -> spot.v1.GetMarketResponse
-	6,  // 22: spot.v1.SpotInstrumentService.CreateMarket:output_type -> spot.v1.CreateMarketResponse
-	8,  // 23: spot.v1.SpotInstrumentService.UpdateMarketDetails:output_type -> spot.v1.UpdateMarketDetailsResponse
-	10, // 24: spot.v1.SpotInstrumentService.UpdateMarketRoles:output_type -> spot.v1.UpdateMarketRolesResponse
-	12, // 25: spot.v1.SpotInstrumentService.DeleteMarket:output_type -> spot.v1.DeleteMarketResponse
-	14, // 26: spot.v1.SpotInstrumentService.ListAllMarkets:output_type -> spot.v1.ListAllMarketsResponse
-	20, // [20:27] is the sub-list for method output_type
-	13, // [13:20] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	0,  // 4: spot.v1.ViewMarketsResponse.markets:type_name -> spot.v1.Market
+	0,  // 5: spot.v1.GetMarketResponse.market:type_name -> spot.v1.Market
+	15, // 6: spot.v1.CreateMarketRequest.required_roles:type_name -> user.v1.Role
+	0,  // 7: spot.v1.CreateMarketResponse.market:type_name -> spot.v1.Market
+	0,  // 8: spot.v1.UpdateMarketDetailsResponse.market:type_name -> spot.v1.Market
+	15, // 9: spot.v1.UpdateMarketRolesRequest.required_roles:type_name -> user.v1.Role
+	0,  // 10: spot.v1.UpdateMarketRolesResponse.market:type_name -> spot.v1.Market
+	0,  // 11: spot.v1.ListAllMarketsResponse.markets:type_name -> spot.v1.Market
+	1,  // 12: spot.v1.SpotInstrumentService.ViewMarkets:input_type -> spot.v1.ViewMarketsRequest
+	3,  // 13: spot.v1.SpotInstrumentService.GetMarket:input_type -> spot.v1.GetMarketRequest
+	5,  // 14: spot.v1.SpotInstrumentService.CreateMarket:input_type -> spot.v1.CreateMarketRequest
+	7,  // 15: spot.v1.SpotInstrumentService.UpdateMarketDetails:input_type -> spot.v1.UpdateMarketDetailsRequest
+	9,  // 16: spot.v1.SpotInstrumentService.UpdateMarketRoles:input_type -> spot.v1.UpdateMarketRolesRequest
+	11, // 17: spot.v1.SpotInstrumentService.DeleteMarket:input_type -> spot.v1.DeleteMarketRequest
+	13, // 18: spot.v1.SpotInstrumentService.ListAllMarkets:input_type -> spot.v1.ListAllMarketsRequest
+	2,  // 19: spot.v1.SpotInstrumentService.ViewMarkets:output_type -> spot.v1.ViewMarketsResponse
+	4,  // 20: spot.v1.SpotInstrumentService.GetMarket:output_type -> spot.v1.GetMarketResponse
+	6,  // 21: spot.v1.SpotInstrumentService.CreateMarket:output_type -> spot.v1.CreateMarketResponse
+	8,  // 22: spot.v1.SpotInstrumentService.UpdateMarketDetails:output_type -> spot.v1.UpdateMarketDetailsResponse
+	10, // 23: spot.v1.SpotInstrumentService.UpdateMarketRoles:output_type -> spot.v1.UpdateMarketRolesResponse
+	12, // 24: spot.v1.SpotInstrumentService.DeleteMarket:output_type -> spot.v1.DeleteMarketResponse
+	14, // 25: spot.v1.SpotInstrumentService.ListAllMarkets:output_type -> spot.v1.ListAllMarketsResponse
+	19, // [19:26] is the sub-list for method output_type
+	12, // [12:19] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_spot_v1_spot_proto_init() }

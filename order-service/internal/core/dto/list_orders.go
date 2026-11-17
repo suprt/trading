@@ -3,6 +3,7 @@ package dto
 import "github.com/suprt/trading/order-service/internal/core/domain"
 
 type ListOrdersInput struct {
+	UserID    *domain.UserID
 	PageSize  int32
 	PageToken string
 }

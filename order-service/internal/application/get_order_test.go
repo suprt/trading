@@ -56,3 +56,15 @@ func TestGetOrder_NoAuth(t *testing.T) {
 	_, err := uc.GetOrder(context.Background(), dto.GetOrderInput{OrderID: "order-1"})
 	require.ErrorIs(t, err, er.ErrUnauthenticated)
 }
+
+func TestGetOrder_AdminCanSeeOthers(t *testing.T) {
+	repo, uc := setupGetOrderTest()
+	repo.orders["order-1"] = &domain.Order{
+		ID: "order-1", UserID: "other-user", Status: domain.OrderStatusCreated,
+	}
+	ctx := ctxWithAdmin("admin-1")
+
+	out, err := uc.GetOrder(ctx, dto.GetOrderInput{OrderID: "order-1"})
+	require.NoError(t, err)
+	require.Equal(t, domain.OrderID("order-1"), out.Order.ID)
+}

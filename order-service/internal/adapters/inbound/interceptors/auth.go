@@ -43,6 +43,7 @@ func UnaryAuth(tokens outbound.TokenIssuer) grpc.UnaryServerInterceptor {
 		}
 
 		ctx = auth.WithUserID(ctx, userID)
+
 		return handler(ctx, req)
 	}
 }

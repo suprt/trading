@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/suprt/trading/spot-service/internal/core/auth"
 	"github.com/suprt/trading/spot-service/internal/core/domain"
+	er "github.com/suprt/trading/spot-service/internal/core/errors"
 
 	"github.com/suprt/trading/spot-service/internal/application"
 	"github.com/suprt/trading/spot-service/internal/core/dto"
@@ -14,33 +16,27 @@ import (
 
 func TestViewMarkets_RoleHierarchy(t *testing.T) {
 	repo := newMockMarketRepo()
-	// BTC - для всех
 	repo.markets["1"] = &domain.Market{ID: "1", Name: "BTC/USDT", Enabled: true}
-	// SOL - для трейдеров
 	repo.markets["2"] = &domain.Market{ID: "2", Name: "SOL/USDT", RequiredRoles: []domain.Role{domain.RoleTrader}, Enabled: true}
-	// DOGE - для админов
 	repo.markets["3"] = &domain.Market{ID: "3", Name: "DOGE/USDT", RequiredRoles: []domain.Role{domain.RoleAdmin}, Enabled: true}
 
 	uc := application.NewViewMarketsUseCase(repo)
 
-	// 1. USER видит только BTC
-	out, err := uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{
-		UserRoles: []domain.Role{domain.RoleUser},
-	})
+	// USER
+	ctx := auth.WithRoles(context.Background(), []domain.Role{domain.RoleUser})
+	out, err := uc.ViewMarkets(ctx, dto.ViewMarketsInput{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, []string{"BTC/USDT"}, marketNames(out.Markets))
 
-	// 2. TRADER видит BTC и SOL
-	out, err = uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{
-		UserRoles: []domain.Role{domain.RoleTrader},
-	})
+	// TRADER
+	ctx = auth.WithRoles(context.Background(), []domain.Role{domain.RoleTrader})
+	out, err = uc.ViewMarkets(ctx, dto.ViewMarketsInput{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, []string{"BTC/USDT", "SOL/USDT"}, marketNames(out.Markets))
 
-	// 3. ADMIN видит всё
-	out, err = uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{
-		UserRoles: []domain.Role{domain.RoleAdmin},
-	})
+	// ADMIN
+	ctx = auth.WithRoles(context.Background(), []domain.Role{domain.RoleAdmin})
+	out, err = uc.ViewMarkets(ctx, dto.ViewMarketsInput{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, []string{"BTC/USDT", "SOL/USDT", "DOGE/USDT"}, marketNames(out.Markets))
 }
@@ -51,10 +47,8 @@ func TestViewMarkets_DisabledAndDeleted(t *testing.T) {
 	repo.markets["2"] = &domain.Market{ID: "2", Name: "DISABLED", Enabled: false}
 
 	uc := application.NewViewMarketsUseCase(repo)
-
-	out, err := uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{
-		UserRoles: []domain.Role{domain.RoleUser},
-	})
+	ctx := auth.WithRoles(context.Background(), []domain.Role{domain.RoleUser})
+	out, err := uc.ViewMarkets(ctx, dto.ViewMarketsInput{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, []string{"ACTIVE"}, marketNames(out.Markets))
 }
@@ -66,10 +60,15 @@ func TestViewMarkets_Deleted(t *testing.T) {
 	repo.markets["2"] = &domain.Market{ID: "2", Name: "ACTIVE", Enabled: true}
 
 	uc := application.NewViewMarketsUseCase(repo)
-
-	out, err := uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{
-		UserRoles: []domain.Role{domain.RoleUser},
-	})
+	ctx := auth.WithRoles(context.Background(), []domain.Role{domain.RoleUser})
+	out, err := uc.ViewMarkets(ctx, dto.ViewMarketsInput{})
 	require.NoError(t, err)
 	require.ElementsMatch(t, []string{"ACTIVE"}, marketNames(out.Markets))
+}
+func TestViewMarkets_NoRoles(t *testing.T) {
+	repo := newMockMarketRepo()
+	uc := application.NewViewMarketsUseCase(repo)
+
+	_, err := uc.ViewMarkets(context.Background(), dto.ViewMarketsInput{})
+	require.ErrorIs(t, err, er.ErrUnauthenticated)
 }

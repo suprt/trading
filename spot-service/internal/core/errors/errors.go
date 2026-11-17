@@ -8,4 +8,5 @@ var (
 	ErrForbidden       = errors.New("forbidden")
 	ErrInvalidToken    = errors.New("invalid access token")
 	ErrInvalidRole     = errors.New("invalid role")
+	ErrUnauthenticated = errors.New("unauthenticated")
 )

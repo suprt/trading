@@ -9,3 +9,10 @@ rate_limiter:
     "/order.v1.OrderService/CancelOrder":
       limit: 30
       window: 1m
+admin:
+  methods:
+    "/order.v1.OrderService/CreateOrder": {}
+    "/order.v1.OrderService/GetOrder": {}
+    "/order.v1.OrderService/GetOrderStatus": {}
+    "/order.v1.OrderService/CancelOrder": {}
+    "/order.v1.OrderService/ListOrders": {}

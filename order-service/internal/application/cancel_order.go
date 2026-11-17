@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/suprt/trading/order-service/internal/core/auth"
+	"github.com/suprt/trading/order-service/internal/core/domain"
 	"github.com/suprt/trading/order-service/internal/core/dto"
 	er "github.com/suprt/trading/order-service/internal/core/errors"
 	"github.com/suprt/trading/order-service/internal/core/ports/outbound"
@@ -24,7 +25,11 @@ func (uc *CancelOrderUseCase) CancelOrder(ctx context.Context, in dto.CancelOrde
 		return nil, er.ErrUnauthenticated
 	}
 
-	order, updated, err := uc.orders.Cancel(ctx, in.OrderID, &callerID, time.Now())
+	var userID *domain.UserID
+	if !auth.IsAdminFromContext(ctx) {
+		userID = &callerID
+	}
+	order, updated, err := uc.orders.Cancel(ctx, in.OrderID, userID, time.Now())
 	if err != nil {
 		return nil, err
 	}

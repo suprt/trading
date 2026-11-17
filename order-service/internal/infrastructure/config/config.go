@@ -50,7 +50,12 @@ type Config struct {
 	UserService              UserService
 	SpotService              SpotService
 	Timeouts                 Timeouts
+	Admin                    Admin
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
+}
+
+type Admin struct {
+	Methods map[string]struct{} `yaml:"methods"`
 }
 
 func Load(yamlPath string) (*Config, error) {

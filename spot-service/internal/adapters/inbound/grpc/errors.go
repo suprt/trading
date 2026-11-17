@@ -19,6 +19,8 @@ func mapError(err error) error {
 		return status.Error(codes.PermissionDenied, err.Error())
 	case errors.Is(err, er.ErrInvalidRole):
 		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, er.ErrUnauthenticated):
+		return status.Error(codes.Unauthenticated, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal error")
 	}

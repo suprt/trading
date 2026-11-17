@@ -207,42 +207,6 @@ func TestHandler_CancelOrder_NotCancellable(t *testing.T) {
 	assert.Equal(t, codes.FailedPrecondition, status.Code(err))
 }
 
-func TestHandler_AdminCancelOrder_Success(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	svc := mocks.NewMockOrderService(ctrl)
-	cancelled := newTestOrder()
-	cancelled.Status = domain.OrderStatusCancelled
-	svc.EXPECT().
-		AdminCancelOrder(gomock.Any(), dto.AdminCancelOrderInput{
-			OrderID: "00000000-0000-0000-0000-000000000001",
-		}).
-		Return(&dto.AdminCancelOrderOutput{Order: cancelled}, nil)
-
-	h := grpchand.New(svc)
-	resp, err := h.AdminCancelOrder(context.Background(), &orderv1.AdminCancelOrderRequest{
-		OrderId: "00000000-0000-0000-0000-000000000001",
-	})
-	require.NoError(t, err)
-	require.Equal(t, orderv1.OrderStatus_ORDER_STATUS_CANCELLED, resp.Order.Status)
-}
-
-func TestHandler_AdminCancelOrder_Forbidden(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	svc := mocks.NewMockOrderService(ctrl)
-	svc.EXPECT().AdminCancelOrder(gomock.Any(), gomock.Any()).Return(nil, er.ErrForbidden)
-
-	h := grpchand.New(svc)
-	_, err := h.AdminCancelOrder(context.Background(), &orderv1.AdminCancelOrderRequest{
-		OrderId: "00000000-0000-0000-0000-000000000001",
-	})
-	require.Error(t, err)
-	assert.Equal(t, codes.PermissionDenied, status.Code(err))
-}
-
 func TestHandler_ListOrders_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -262,22 +226,22 @@ func TestHandler_ListOrders_Success(t *testing.T) {
 	require.Equal(t, "next", resp.NextPageToken)
 }
 
-func TestHandler_AdminListOrders_FilterByUser(t *testing.T) {
+func TestHandler_ListOrders_WithUserID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	uid := domain.UserID("00000000-0000-0000-0000-000000000002")
 	svc := mocks.NewMockOrderService(ctrl)
 	svc.EXPECT().
-		AdminListOrders(gomock.Any(), dto.AdminListOrdersInput{
+		ListOrders(gomock.Any(), dto.ListOrdersInput{
 			UserID:   &uid,
 			PageSize: 10,
 		}).
-		Return(&dto.AdminListOrdersOutput{Orders: []*domain.Order{newTestOrder()}}, nil)
+		Return(&dto.ListOrdersOutput{Orders: []*domain.Order{newTestOrder()}}, nil)
 
 	h := grpchand.New(svc)
 	userIdStr := "00000000-0000-0000-0000-000000000002"
-	resp, err := h.AdminListOrders(context.Background(), &orderv1.AdminListOrdersRequest{
+	resp, err := h.ListOrders(context.Background(), &orderv1.ListOrdersRequest{
 		UserId:   &userIdStr,
 		PageSize: 10,
 	})

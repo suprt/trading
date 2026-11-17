@@ -105,3 +105,16 @@ func TestCancelOrder_NoAuth(t *testing.T) {
 	_, err := uc.CancelOrder(context.Background(), dto.CancelOrderInput{OrderID: "order-1"})
 	require.ErrorIs(t, err, er.ErrUnauthenticated)
 }
+
+func TestCancelOrder_AdminCanCancelOthers(t *testing.T) {
+	repo, uc := setupCancelOrderTest()
+	repo.orders["order-1"] = &domain.Order{
+		ID: "order-1", UserID: "other-user", Status: domain.OrderStatusCreated,
+	}
+	ctx := ctxWithAdmin("admin-1")
+
+	out, err := uc.CancelOrder(ctx, dto.CancelOrderInput{OrderID: "order-1"})
+	require.NoError(t, err)
+	require.Equal(t, domain.OrderStatusCancelled, out.Order.Status)
+	require.Equal(t, domain.OrderStatusCancelled, repo.orders["order-1"].Status)
+}

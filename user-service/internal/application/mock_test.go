@@ -151,6 +151,9 @@ func (m *mockSessionRepo) DeleteByUserID(_ context.Context, userID domain.UserID
 	}
 	return nil
 }
+func (m *mockSessionRepo) DeleteExpired(_ context.Context, before time.Time) (int64, error) {
+	return 0, nil
+}
 
 // --- PasswordHasher ---
 

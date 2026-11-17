@@ -41,12 +41,13 @@ func UnaryAuth(tokens outbound.TokenIssuer, wl map[string]struct{}) grpc.UnarySe
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header")
 		}
 
-		userID, _, _, err := tokens.ParseAccess(domain.AccessToken(raw))
+		userID, roles, _, err := tokens.ParseAccess(domain.AccessToken(raw))
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid token")
 		}
 
 		ctx = auth.WithUserID(ctx, userID)
+		ctx = auth.WithRoles(ctx, roles)
 		return handler(ctx, req)
 	}
 }

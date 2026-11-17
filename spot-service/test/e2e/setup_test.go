@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 	sharedconfig "github.com/suprt/trading/shared/config"
@@ -20,6 +21,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/test/bufconn"
 
 	spotv1 "github.com/suprt/trading/proto/spot/v1"
@@ -32,6 +34,23 @@ const bufSize = 1024 * 1024
 // Мок клиента к user-service (чтобы не поднимать user-service).
 type fakeUserClient struct {
 	roles []string
+}
+
+const jwtSecret = "test-secret"
+
+// authCtx генерирует валидный JWT с sub и roles и кладёт в metadata.
+func authCtx(t *testing.T, userID string, roles []string) context.Context {
+	t.Helper()
+	claims := jwt.MapClaims{
+		"sub":   userID,
+		"roles": roles,
+		"exp":   time.Now().Add(time.Hour).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString([]byte(jwtSecret))
+	require.NoError(t, err)
+	return metadata.AppendToOutgoingContext(context.Background(),
+		"authorization", "Bearer "+signed)
 }
 
 func (f *fakeUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int64, error) {
@@ -100,7 +119,7 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 		DB:          0,
 		PingTimeout: 10 * time.Second,
 		JWT: spotconfig.JWT{
-			Secret: "test-secret",
+			Secret: jwtSecret,
 		},
 		Internal: spotconfig.Internal{
 			Secret: "test-internal-secret",
@@ -115,8 +134,7 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 		Format: "console",
 		Auth: spotconfig.Auth{
 			Whitelist: map[string]struct{}{
-				"/spot.v1.SpotInstrumentService/ViewMarkets": {},
-				"/spot.v1.SpotInstrumentService/GetMarket":   {},
+				"/spot.v1.SpotInstrumentService/GetMarket": {},
 			},
 		},
 		Seed: spotconfig.Seed{
@@ -146,12 +164,6 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 		fx.Decorate(
 			func(_ outbound.UserClient) outbound.UserClient {
 				return &fakeUserClient{roles: callerRoles}
-			},
-		),
-		// Мокаем TokenIssuer
-		fx.Decorate(
-			func(_ outbound.TokenIssuer) outbound.TokenIssuer {
-				return &fakeTokenIssuer{}
 			},
 		),
 		fx.Provide(
@@ -189,6 +201,7 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 		_ = newApp.Stop(ctx)
 		_ = conn.Close()
 		_ = pgContainer.Terminate(ctx)
+		_ = redisContainer.Terminate(ctx)
 	}
 	return client, cleanup
 }

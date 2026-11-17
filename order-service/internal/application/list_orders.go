@@ -25,6 +25,16 @@ func (uc *ListOrdersUseCase) ListOrders(ctx context.Context, in dto.ListOrdersIn
 		return nil, er.ErrUnauthenticated
 	}
 
+	var filterUserID *domain.UserID
+	if auth.IsAdminFromContext(ctx) {
+		filterUserID = in.UserID // админ: nil = все, задан = фильтр
+	} else {
+		if in.UserID != nil && *in.UserID != callerID {
+			return nil, er.ErrForbidden
+		}
+		filterUserID = &callerID
+	}
+
 	limit := int(in.PageSize)
 	if limit <= 0 {
 		limit = 20
@@ -40,7 +50,7 @@ func (uc *ListOrdersUseCase) ListOrders(ctx context.Context, in dto.ListOrdersIn
 		}
 	}
 
-	orders, err := uc.orders.ListByUser(ctx, callerID, limit+1, afterCreatedAt, afterID)
+	orders, err := uc.orders.ListAll(ctx, filterUserID, limit+1, afterCreatedAt, afterID)
 	if err != nil {
 		return nil, err
 	}

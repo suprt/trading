@@ -162,25 +162,6 @@ func TestE2E_GetOrder_Forbidden(t *testing.T) {
 	assert.Equal(t, codes.PermissionDenied, status.Code(err))
 }
 
-func TestE2E_AdminCancelOrder(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets())
-	defer env.cleanup()
-
-	created, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
-		MarketId: string(marketID),
-		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
-		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
-		Quantity: 1,
-	})
-	require.NoError(t, err)
-
-	cancelled, err := env.client.AdminCancelOrder(authCtx(t, adminID), &orderv1.AdminCancelOrderRequest{
-		OrderId: created.Order.Id,
-	})
-	require.NoError(t, err)
-	require.Equal(t, orderv1.OrderStatus_ORDER_STATUS_CANCELLED, cancelled.Order.Status)
-}
-
 func TestE2E_ListOrders(t *testing.T) {
 	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
 	defer env.cleanup()
@@ -213,8 +194,8 @@ func TestE2E_ListOrders_InvalidPageToken(t *testing.T) {
 	assert.Equal(t, codes.InvalidArgument, status.Code(err))
 }
 
-func TestE2E_AdminListOrders_FilterByUser(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets())
+func TestE2E_ListOrders_AdminFilterByUser(t *testing.T) {
+	env := setupTestServer(t, []domain.Role{domain.RoleAdmin}, defaultMarkets())
 	defer env.cleanup()
 
 	// user создаёт 2 заказа
@@ -230,7 +211,7 @@ func TestE2E_AdminListOrders_FilterByUser(t *testing.T) {
 
 	// админ видит только заказы userID
 	uid := userID
-	out, err := env.client.AdminListOrders(authCtx(t, adminID), &orderv1.AdminListOrdersRequest{
+	out, err := env.client.ListOrders(authCtx(t, adminID), &orderv1.ListOrdersRequest{
 		UserId:   &uid,
 		PageSize: 10,
 	})
@@ -239,4 +220,25 @@ func TestE2E_AdminListOrders_FilterByUser(t *testing.T) {
 	for _, o := range out.Orders {
 		require.Equal(t, userID, o.UserId)
 	}
+}
+
+func TestE2E_GetOrder_AdminCanSeeOthers(t *testing.T) {
+	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets())
+	defer env.cleanup()
+
+	// user создаёт заказ
+	created, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+		MarketId: string(marketID),
+		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
+		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
+		Quantity: 1,
+	})
+	require.NoError(t, err)
+
+	// админ видит чужой заказ
+	got, err := env.client.GetOrder(authCtx(t, adminID), &orderv1.GetOrderRequest{
+		OrderId: created.Order.Id,
+	})
+	require.NoError(t, err)
+	require.Equal(t, created.Order.Id, got.Order.Id)
 }
