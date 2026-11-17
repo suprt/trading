@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"buf.build/go/protovalidate"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"github.com/suprt/trading/shared/bootstrap"
@@ -94,15 +95,15 @@ func Module(cfg spotconfig.Config) fx.Option {
 
 		// --- Client user-service ---
 		fx.Provide(
-			func(cfg spotconfig.Config) userv1.UserServiceClient {
+			func(cfg spotconfig.Config) (userv1.UserServiceClient, error) {
 				conn, err := grpc.NewClient(
 					cfg.UserService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
 				)
 				if err != nil {
-					panic(err)
+					return nil, err //TODO: обработать и вернуть ошибку
 				}
-				return userv1.NewUserServiceClient(conn)
+				return userv1.NewUserServiceClient(conn), nil
 			},
 			fx.Annotate(
 				func(c userv1.UserServiceClient, cfg spotconfig.Config) outbound.UserClient {
@@ -139,6 +140,8 @@ func Module(cfg spotconfig.Config) fx.Option {
 				}
 			},
 		),
+		// -- Validator
+		fx.Provide(protovalidate.New()),
 
 		// --- Interceptors ---
 		fx.Provide(
@@ -149,6 +152,7 @@ func Module(cfg spotconfig.Config) fx.Option {
 				rlCfg sharedinters.RateLimiterConfig,
 				errReporter outbound.ErrorReporter,
 				cfg spotconfig.Config,
+				validator protovalidate.Validator,
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
@@ -156,7 +160,7 @@ func Module(cfg spotconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					spotinters.UnaryAuth(tokens, cfg.Auth.Whitelist),
-					sharedinters.UnaryValidation(),
+					sharedinters.UnaryValidation(validator),
 				}
 			},
 		),

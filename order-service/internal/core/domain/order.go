@@ -2,8 +2,6 @@ package domain
 
 import (
 	"time"
-
-	er "github.com/suprt/trading/order-service/internal/core/errors"
 )
 
 type OrderID string
@@ -44,14 +42,4 @@ type Order struct {
 	Status    OrderStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-// Cancel переводит заказ в CANCELLED, если он ещё не терминальный.
-func (o *Order) Cancel(now time.Time) error {
-	if o.Status != OrderStatusCreated {
-		return er.ErrOrderNotCancellable
-	}
-	o.Status = OrderStatusCancelled
-	o.UpdatedAt = now
-	return nil
 }

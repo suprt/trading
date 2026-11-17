@@ -14,11 +14,10 @@ import (
 type UpdateMarketDetailsUseCase struct {
 	markets outbound.MarketRepository
 	users   outbound.UserClient
-	ids     outbound.IDGenerator
 }
 
-func NewUpdateMarketDetailsUseCase(m outbound.MarketRepository, u outbound.UserClient, ids outbound.IDGenerator) *UpdateMarketDetailsUseCase {
-	return &UpdateMarketDetailsUseCase{markets: m, users: u, ids: ids}
+func NewUpdateMarketDetailsUseCase(m outbound.MarketRepository, u outbound.UserClient) *UpdateMarketDetailsUseCase {
+	return &UpdateMarketDetailsUseCase{markets: m, users: u}
 }
 
 func (uc *UpdateMarketDetailsUseCase) UpdateMarketDetails(ctx context.Context,

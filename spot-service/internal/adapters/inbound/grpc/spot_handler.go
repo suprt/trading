@@ -21,6 +21,7 @@ func New(spotService inbound.SpotService) *Handler {
 	return &Handler{spotService: spotService}
 }
 
+//TODO: ViewMarkets - отображатает доступные для юзера маркеты в зависимоти от ЕГО ролей
 func (h *Handler) ViewMarkets(ctx context.Context, req *spotv1.ViewMarketsRequest) (*spotv1.ViewMarketsResponse, error) {
 	roles, err := rolesFromProto(req.GetUserRoles())
 	if err != nil {

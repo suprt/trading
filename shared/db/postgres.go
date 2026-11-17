@@ -20,7 +20,7 @@ func NewPostgres(cfg Config) (*pgxpool.Pool, error) {
 	if cfg.ConnectTimeout <= 0 {
 		cfg.ConnectTimeout = 10 * time.Second
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.ConnectTimeout) //TODO: timeout to cfg
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.ConnectTimeout)
 	defer cancel()
 	poolCfg, err := pgxpool.ParseConfig(cfg.DSN)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"buf.build/go/protovalidate"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	userv1 "github.com/suprt/trading/proto/user/v1"
@@ -144,6 +145,9 @@ func Module(cfg userconfig.Config) fx.Option {
 			},
 		),
 
+		// -- Validator
+		fx.Provide(protovalidate.New),
+
 		// -- Interceptors --
 		fx.Provide(
 			func(
@@ -153,6 +157,7 @@ func Module(cfg userconfig.Config) fx.Option {
 				redisClient *redis.Client,
 				rlCfg sharedinters.RateLimiterConfig,
 				errReporter sharedinters.ErrorReporter,
+				validator protovalidate.Validator,
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
@@ -160,7 +165,7 @@ func Module(cfg userconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					userinters.UnaryAuth(tokens, cfg.Auth.Whitelist, cfg.Internal.Secret),
-					sharedinters.UnaryValidation(),
+					sharedinters.UnaryValidation(validator),
 				}
 			},
 		),
@@ -214,6 +219,7 @@ func Module(cfg userconfig.Config) fx.Option {
 			application.NewListUsersUseCase,
 			application.NewGetUserRolesUseCase,
 			application.NewService,
+			application.NewCleanupSessionsUseCase,
 		),
 
 		fx.Provide(
@@ -221,11 +227,17 @@ func Module(cfg userconfig.Config) fx.Option {
 				func(s *application.Service) inbound.UserService { return s },
 			),
 		),
+		fx.Provide(
+			fx.Annotate(
+				func(s *application.CleanupSessionsUseCase) Cleaner { return s },
+			),
+		),
 		fx.Provide(grpchand.New),
 		fx.Invoke(registerGRPCHandlers),
 
 		fx.Provide(application.NewSeed),
 		fx.Invoke(RunSeeder),
+		fx.Invoke(RunSessionCleaner),
 	)
 }
 func registerGRPCHandlers(srv *grpc.Server, h *grpchand.Handler) {

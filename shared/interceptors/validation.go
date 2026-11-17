@@ -10,14 +10,15 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func UnaryValidation() grpc.UnaryServerInterceptor {
+// TODO: педевать валидатор внутри module
+func UnaryValidation(validator protovalidate.Validator) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		msg, ok := req.(proto.Message)
 
 		if !ok {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid request type")
 		}
-		if err := protovalidate.Validate(msg); err != nil {
+		if err := validator.Validate(msg); err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "%s", err.Error())
 		}
 		return handler(ctx, req)

@@ -14,7 +14,6 @@ func NewReporter(logger *zap.Logger) *Reporter {
 	return &Reporter{logger: logger}
 }
 
-// TODO: ограничить частоту лога ошибок
 func (r *Reporter) Report(_ context.Context, err error, attrs map[string]string) {
 	fields := make([]zap.Field, 0, len(attrs)+1)
 	for k, v := range attrs {

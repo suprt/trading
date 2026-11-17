@@ -9,7 +9,7 @@ import "user/v1/user.proto";
 option go_package = "github.com/suprt/trading/proto/spot/v1;spot_v1";
 
 message Market {
-  string market_id = 1 [(buf.validate.field).string.uuid=true]; //TODO: validate uuid
+  string market_id = 1 [(buf.validate.field).string.uuid=true];
   string name = 2;
   repeated user.v1.Role required_roles = 3;
   bool enabled = 4;

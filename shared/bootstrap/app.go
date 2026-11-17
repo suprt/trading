@@ -7,7 +7,7 @@ import (
 )
 
 func NewApp(opts Options) *fx.App {
-	//TODO: start timeout
+
 	return fx.New(
 		fx.Provide(func() grpcServer.Addr {
 			return grpcServer.Addr(opts.Addr)

@@ -75,7 +75,7 @@ func (c *MarketCache) InvalidateList(ctx context.Context) error {
 }
 
 func (c *MarketCache) AcquireLock(ctx context.Context) (bool, error) {
-	ok, err := c.client.SetNX(ctx, "markets:lock", "1", c.lockTTL).Result() //TODO: timeout to cfg
+	ok, err := c.client.SetNX(ctx, "markets:lock", "1", c.lockTTL).Result()
 	return ok, err
 }
 

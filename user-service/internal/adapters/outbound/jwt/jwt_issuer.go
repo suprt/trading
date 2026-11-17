@@ -3,6 +3,7 @@ package jwt
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -12,8 +13,9 @@ import (
 )
 
 // 32 байта = 256 бит энтропии.
-//  После RawURLEncoding → 43 символа base64.
-//  Если меняешь — обнови (buf.validate.field).string.len в user.proto.
+//
+//	После RawURLEncoding → 43 символа base64.
+//	Если меняешь — обнови (buf.validate.field).string.len в user.proto.
 const refreshEntropyBytes = 32
 
 type Config struct {
@@ -61,7 +63,7 @@ func (j *Issuer) ParseAccess(token domain.AccessToken) (domain.UserID, []domain.
 			return nil, errors.New("unexpected signing method")
 		}
 		return j.secret, nil
-	})
+	}, jwt.WithJSONNumber())
 	if err != nil {
 		return "", nil, 0, er.ErrInvalidToken
 	}
@@ -80,8 +82,10 @@ func (j *Issuer) ParseAccess(token domain.AccessToken) (domain.UserID, []domain.
 	}
 
 	var rv int64
-	if v, ok := claims["rv"].(int64); ok {
-		rv = v
+	if num, ok := claims["rv"].(json.Number); ok {
+		if v, err := num.Int64(); err == nil {
+			rv = v
+		}
 	}
 
 	var roles []domain.Role

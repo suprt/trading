@@ -28,7 +28,7 @@ func (c *UserClient) GetUserRoles(ctx context.Context, userID domain.UserID) ([]
 	if err != nil {
 		return nil, 0, err
 	}
-
+	//TODO: переделать на switch как в мапере
 	roles, err := rolemapper.RolesFromProto(resp.Roles)
 	if err != nil {
 		return nil, 0, err

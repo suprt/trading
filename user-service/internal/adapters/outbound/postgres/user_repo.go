@@ -91,7 +91,7 @@ func (r *UserRepo) UpdateRoles(ctx context.Context, u *domain.User) (err error) 
 	if n == 0 {
 		return er.ErrUserNotFound
 	}
-	//TODO: разделить update
+
 	_, err = db.Exec(ctx, `DELETE FROM user_roles WHERE user_id = $1`, u.ID)
 	if err != nil {
 		return err

@@ -2,9 +2,9 @@ package userclient
 
 import (
 	"context"
-	"strings"
 
 	"github.com/suprt/trading/spot-service/internal/core/domain"
+	er "github.com/suprt/trading/spot-service/internal/core/errors"
 	"google.golang.org/grpc/metadata"
 
 	userv1 "github.com/suprt/trading/proto/user/v1"
@@ -29,9 +29,35 @@ func (c *UserClient) GetUserRoles(ctx context.Context, userID domain.UserID) ([]
 		return nil, 0, err
 	}
 
-	roles := make([]domain.Role, len(resp.Roles))
-	for i, r := range resp.Roles {
-		roles[i] = domain.Role(strings.TrimPrefix(r.String(), "ROLE_"))
+	roles, err := RolesFromProto(resp.Roles)
+	if err != nil {
+		return nil, 0, err
 	}
+	//TODO: переделать на switch как в мапере
 	return roles, resp.RolesVersion, nil
+}
+
+func roleFromProto(r userv1.Role) (domain.Role, error) {
+	switch r {
+	case userv1.Role_ROLE_USER:
+		return domain.RoleUser, nil
+	case userv1.Role_ROLE_TRADER:
+		return domain.RoleTrader, nil
+	case userv1.Role_ROLE_ADMIN:
+		return domain.RoleAdmin, nil
+	default:
+		return "", er.ErrInvalidRole
+	}
+}
+
+func RolesFromProto(roles []userv1.Role) ([]domain.Role, error) {
+	result := make([]domain.Role, 0, len(roles))
+	for _, r := range roles {
+		mapped, err := roleFromProto(r)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, mapped)
+	}
+	return result, nil
 }

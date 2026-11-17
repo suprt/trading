@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"buf.build/go/protovalidate"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	sharedconfig "github.com/suprt/trading/shared/config"
@@ -113,6 +114,8 @@ func Module(cfg orderconfig.Config) fx.Option {
 				}
 			},
 		),
+		// -- Validator
+		fx.Provide(protovalidate.New()),
 
 		// --- Interceptors ---
 		fx.Provide(
@@ -122,6 +125,7 @@ func Module(cfg orderconfig.Config) fx.Option {
 				redisClient *redis.Client,
 				rlCfg sharedinters.RateLimiterConfig,
 				errReporter outbound.ErrorReporter,
+				validator protovalidate.Validator,
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
@@ -129,31 +133,32 @@ func Module(cfg orderconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					orderinters.UnaryAuth(tokens),
+					sharedinters.UnaryValidation(validator),
 				}
 			},
 		),
 
 		// --- Outbound clients ---
 		fx.Provide(
-			func(cfg orderconfig.Config) userv1.UserServiceClient {
+			func(cfg orderconfig.Config) (userv1.UserServiceClient, error) {
 				conn, err := grpc.NewClient(
 					cfg.UserService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
 				)
 				if err != nil {
-					panic(err)
+					return nil, err
 				}
-				return userv1.NewUserServiceClient(conn)
+				return userv1.NewUserServiceClient(conn), nil
 			},
-			func(cfg orderconfig.Config) spotv1.SpotInstrumentServiceClient {
+			func(cfg orderconfig.Config) (spotv1.SpotInstrumentServiceClient, error) {
 				conn, err := grpc.NewClient(
 					cfg.SpotService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
 				)
 				if err != nil {
-					panic(err)
-				}
-				return spotv1.NewSpotInstrumentServiceClient(conn)
+					return nil, err
+				} //TODO: обработать и вернуть ошибку
+				return spotv1.NewSpotInstrumentServiceClient(conn), nil
 			},
 			fx.Annotate(
 				func(c userv1.UserServiceClient, cfg orderconfig.Config) outbound.UserClient {
@@ -222,7 +227,7 @@ func Start() {
 	}
 	sugar := zapLogger.Sugar()
 	sugar.Infow("service starting",
-		"name", "spot-service",
+		"name", "order-service",
 		"addr", cfg.GRPC.Addr,
 		"log_level", cfg.Log.Level,
 		"log_format", cfg.Log.Format,

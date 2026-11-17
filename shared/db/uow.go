@@ -55,7 +55,6 @@ func (u *UoW) Do(ctx context.Context, fn func(ctx context.Context) error) error 
 	if err := fn(ctx); err != nil {
 		return err
 	}
-	//TODO: recover
 	return tx.Commit(ctx)
 }
 

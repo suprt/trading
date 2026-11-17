@@ -37,4 +37,4 @@ func (uc *Seed) SeedMarket(ctx context.Context, in dto.SeedMarketInput) error {
 		return err
 	}
 	return nil
-} //TODO: убрать GetByName, Create если ошибка наличия маркета игнор, остальные пробрасываем
+}

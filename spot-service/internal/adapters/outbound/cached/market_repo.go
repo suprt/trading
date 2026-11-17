@@ -111,15 +111,20 @@ func (r *MarketRepo) SoftDelete(ctx context.Context, id domain.MarketID, deleted
 }
 
 func (r *MarketRepo) invalidate(ctx context.Context, id domain.MarketID) {
-	_, err := r.cache.AcquireLock(ctx)
+	isLocked, err := r.cache.AcquireLock(ctx)
 	if err != nil {
 		r.reporter.Report(ctx, err, map[string]string{"op": "cache_acquire_lock"})
 	}
-	defer func() {
-		if err := r.cache.ReleaseLock(ctx); err != nil {
-			r.reporter.Report(ctx, err, map[string]string{"op": "cache_release_lock"})
-		}
-	}()
+
+		defer func() {
+			if isLocked{
+			if err := r.cache.ReleaseLock(ctx); err != nil {
+				r.reporter.Report(ctx, err, map[string]string{"op": "cache_release_lock"})
+			}
+			}
+		}()
+
+
 
 	if err := r.cache.InvalidateByID(ctx, id); err != nil {
 		r.reporter.Report(ctx, err, map[string]string{
