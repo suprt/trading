@@ -35,3 +35,6 @@ rate_limiter:
     "/user.v1.UserService/RefreshToken":
       limit: 20
       window: 1m
+admin:
+  methods:
+    "/user.v1.UserService/UpdateProfile": {}

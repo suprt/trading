@@ -12,7 +12,6 @@ type Service struct {
 	*GetPublicProfileUseCase
 	*UpdateProfileUseCase
 	*ChangePasswordUseCase
-	*AdminUpdateProfileUseCase
 	*AdminResetPasswordUseCase
 	*ListUsersUseCase
 	*GetUserRolesUseCase
@@ -30,7 +29,6 @@ func NewService(
 	getPublicProfile *GetPublicProfileUseCase,
 	updateProfile *UpdateProfileUseCase,
 	changePassword *ChangePasswordUseCase,
-	adminUpdateProfile *AdminUpdateProfileUseCase,
 	adminResetPassword *AdminResetPasswordUseCase,
 	listUsersUseCase *ListUsersUseCase,
 	getUserRolesUseCase *GetUserRolesUseCase,
@@ -47,7 +45,6 @@ func NewService(
 		GetPublicProfileUseCase:   getPublicProfile,
 		UpdateProfileUseCase:      updateProfile,
 		ChangePasswordUseCase:     changePassword,
-		AdminUpdateProfileUseCase: adminUpdateProfile,
 		AdminResetPasswordUseCase: adminResetPassword,
 		ListUsersUseCase:          listUsersUseCase,
 		GetUserRolesUseCase:       getUserRolesUseCase,

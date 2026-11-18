@@ -20,7 +20,6 @@ type UserService interface {
 	GetPublicProfile(ctx context.Context, in dto.GetPublicProfileInput) (*dto.GetPublicProfileOutput, error)
 	UpdateProfile(ctx context.Context, in dto.UpdateProfileInput) error
 	ChangePassword(ctx context.Context, in dto.ChangePasswordInput) error
-	AdminUpdateProfile(ctx context.Context, in dto.AdminUpdateProfileInput) error
 	AdminResetPassword(ctx context.Context, in dto.AdminResetPasswordInput) (*dto.AdminResetPasswordOutput, error)
 	ListUsers(ctx context.Context, in dto.ListUsersInput) (*dto.ListUsersOutput, error)
 	GetUserRoles(ctx context.Context, in dto.GetUserRolesInput) (*dto.GetUserRolesOutput, error)

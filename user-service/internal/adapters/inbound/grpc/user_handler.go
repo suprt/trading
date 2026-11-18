@@ -150,6 +150,10 @@ func (h *Handler) GetPublicProfile(ctx context.Context, req *userv1.GetPublicPro
 
 func (h *Handler) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.UpdateProfileResponse, error) {
 	in := dto.UpdateProfileInput{}
+	if req.UserId != nil {
+		uid := domain.UserID(req.GetUserId())
+		in.UserID = &uid
+	}
 	if req.Email != nil {
 		in.Email = req.Email
 	}
@@ -172,22 +176,6 @@ func (h *Handler) ChangePassword(ctx context.Context, req *userv1.ChangePassword
 		return nil, mapErr(err)
 	}
 	return &userv1.ChangePasswordResponse{}, nil
-}
-
-func (h *Handler) AdminUpdateProfile(ctx context.Context,
-	req *userv1.AdminUpdateProfileRequest) (*userv1.AdminUpdateProfileResponse, error) {
-	in := dto.AdminUpdateProfileInput{UserID: domain.UserID(req.GetUserId())}
-	if req.Email != nil {
-		in.Email = req.Email
-	}
-	if req.Username != nil {
-		in.Username = req.Username
-	}
-
-	if err := h.userService.AdminUpdateProfile(ctx, in); err != nil {
-		return nil, mapErr(err)
-	}
-	return &userv1.AdminUpdateProfileResponse{}, nil
 }
 
 func (h *Handler) AdminResetPassword(ctx context.Context,

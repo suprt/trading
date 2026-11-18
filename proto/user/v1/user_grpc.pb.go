@@ -30,7 +30,6 @@ const (
 	UserService_GetPublicProfile_FullMethodName   = "/user.v1.UserService/GetPublicProfile"
 	UserService_UpdateProfile_FullMethodName      = "/user.v1.UserService/UpdateProfile"
 	UserService_ChangePassword_FullMethodName     = "/user.v1.UserService/ChangePassword"
-	UserService_AdminUpdateProfile_FullMethodName = "/user.v1.UserService/AdminUpdateProfile"
 	UserService_AdminResetPassword_FullMethodName = "/user.v1.UserService/AdminResetPassword"
 	UserService_ListUsers_FullMethodName          = "/user.v1.UserService/ListUsers"
 	UserService_GetUserRoles_FullMethodName       = "/user.v1.UserService/GetUserRoles"
@@ -51,7 +50,6 @@ type UserServiceClient interface {
 	GetPublicProfile(ctx context.Context, in *GetPublicProfileRequest, opts ...grpc.CallOption) (*GetPublicProfileResponse, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UpdateProfileResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
-	AdminUpdateProfile(ctx context.Context, in *AdminUpdateProfileRequest, opts ...grpc.CallOption) (*AdminUpdateProfileResponse, error)
 	AdminResetPassword(ctx context.Context, in *AdminResetPasswordRequest, opts ...grpc.CallOption) (*AdminResetPasswordResponse, error)
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersResponse, error)
 	GetUserRoles(ctx context.Context, in *GetUserRolesRequest, opts ...grpc.CallOption) (*GetUserRolesResponse, error)
@@ -175,16 +173,6 @@ func (c *userServiceClient) ChangePassword(ctx context.Context, in *ChangePasswo
 	return out, nil
 }
 
-func (c *userServiceClient) AdminUpdateProfile(ctx context.Context, in *AdminUpdateProfileRequest, opts ...grpc.CallOption) (*AdminUpdateProfileResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AdminUpdateProfileResponse)
-	err := c.cc.Invoke(ctx, UserService_AdminUpdateProfile_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userServiceClient) AdminResetPassword(ctx context.Context, in *AdminResetPasswordRequest, opts ...grpc.CallOption) (*AdminResetPasswordResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AdminResetPasswordResponse)
@@ -230,7 +218,6 @@ type UserServiceServer interface {
 	GetPublicProfile(context.Context, *GetPublicProfileRequest) (*GetPublicProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
-	AdminUpdateProfile(context.Context, *AdminUpdateProfileRequest) (*AdminUpdateProfileResponse, error)
 	AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error)
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersResponse, error)
 	GetUserRoles(context.Context, *GetUserRolesRequest) (*GetUserRolesResponse, error)
@@ -276,9 +263,6 @@ func (UnimplementedUserServiceServer) UpdateProfile(context.Context, *UpdateProf
 }
 func (UnimplementedUserServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ChangePassword not implemented")
-}
-func (UnimplementedUserServiceServer) AdminUpdateProfile(context.Context, *AdminUpdateProfileRequest) (*AdminUpdateProfileResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method AdminUpdateProfile not implemented")
 }
 func (UnimplementedUserServiceServer) AdminResetPassword(context.Context, *AdminResetPasswordRequest) (*AdminResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AdminResetPassword not implemented")
@@ -508,24 +492,6 @@ func _UserService_ChangePassword_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_AdminUpdateProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AdminUpdateProfileRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).AdminUpdateProfile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_AdminUpdateProfile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).AdminUpdateProfile(ctx, req.(*AdminUpdateProfileRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _UserService_AdminResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AdminResetPasswordRequest)
 	if err := dec(in); err != nil {
@@ -630,10 +596,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChangePassword",
 			Handler:    _UserService_ChangePassword_Handler,
-		},
-		{
-			MethodName: "AdminUpdateProfile",
-			Handler:    _UserService_AdminUpdateProfile_Handler,
 		},
 		{
 			MethodName: "AdminResetPassword",

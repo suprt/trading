@@ -228,8 +228,8 @@ func TestE2E_AdminFlow(t *testing.T) {
 
 	// 4. AdminUpdateProfile — меняем username target'а
 	newUsername := "target_renamed"
-	_, err = client.AdminUpdateProfile(adminAuth, &userv1.AdminUpdateProfileRequest{
-		UserId:   targetID,
+	_, err = client.UpdateProfile(adminAuth, &userv1.UpdateProfileRequest{
+		UserId:   &targetID,
 		Username: &newUsername,
 	})
 	require.NoError(t, err)

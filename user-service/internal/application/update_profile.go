@@ -30,9 +30,15 @@ func (uc *UpdateProfileUseCase) UpdateProfile(ctx context.Context, in dto.Update
 	if !ok {
 		return er.ErrUnauthenticated
 	}
-
+	targetID := callerID
+	if in.UserID != nil {
+		if *in.UserID != callerID && !auth.IsAdminFromContext(ctx) {
+			return er.ErrForbidden
+		}
+		targetID = *in.UserID
+	}
 	return uc.uow.Do(ctx, func(ctx context.Context) error {
-		user, err := uc.users.GetByID(ctx, callerID)
+		user, err := uc.users.GetByID(ctx, targetID)
 		if err != nil {
 			return err
 		}

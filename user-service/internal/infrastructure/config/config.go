@@ -40,6 +40,7 @@ type Config struct {
 	Idempotency              Idempotency
 	Internal                 Internal
 	Sessions                 Sessions
+	Admin                    Admin
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
 	Seed                     Seed `yaml:"seed"`
 	Auth                     Auth `yaml:"auth"`
@@ -80,6 +81,9 @@ type Postgres struct {
 
 type Internal struct {
 	Secret string `env:"INTERNAL_SECRET" envDefault:"dev-internal-secret"`
+}
+type Admin struct {
+	Methods map[string]struct{} `yaml:"methods"`
 }
 
 func Load(yamlPath string) (*Config, error) {

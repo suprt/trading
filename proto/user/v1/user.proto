@@ -26,7 +26,6 @@ service UserService {
   rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);
   rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
-  rpc AdminUpdateProfile(AdminUpdateProfileRequest) returns (AdminUpdateProfileResponse);
   rpc AdminResetPassword(AdminResetPasswordRequest) returns (AdminResetPasswordResponse);
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
   rpc GetUserRoles(GetUserRolesRequest) returns (GetUserRolesResponse); //Internal endpoint
@@ -138,8 +137,9 @@ message GetPublicProfileResponse {
 }
 
 message UpdateProfileRequest {
-  optional string email = 1 [(buf.validate.field).string.email = true];
-  optional string username = 2 [
+  optional string user_id = 1 [(buf.validate.field).string.uuid = true];
+  optional string email = 2 [(buf.validate.field).string.email = true];
+  optional string username = 3 [
     (buf.validate.field).string.min_len = 3,
     (buf.validate.field).string.max_len = 30,
     (buf.validate.field).string.pattern = "^[a-zA-Z0-9_]+$"
@@ -161,17 +161,6 @@ message ChangePasswordRequest {
 
 message ChangePasswordResponse {}
 
-message AdminUpdateProfileRequest {
-  string user_id = 1 [(buf.validate.field).string.uuid = true];
-  optional string email = 2 [(buf.validate.field).string.email = true];
-  optional string username = 3 [
-    (buf.validate.field).string.min_len = 3,
-    (buf.validate.field).string.max_len = 30,
-    (buf.validate.field).string.pattern = "^[a-zA-Z0-9_]+$"
-  ];
-}
-
-message AdminUpdateProfileResponse {}
 
 message AdminResetPasswordRequest {
   string user_id = 1 [(buf.validate.field).string.uuid = true];

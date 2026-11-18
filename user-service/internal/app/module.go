@@ -35,6 +35,10 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+var defaultAdminMethods = map[string]struct{}{
+	"/user.v1.UserService/UpdateProfile": {},
+}
+
 func Module(cfg userconfig.Config) fx.Option {
 	return fx.Module("user",
 		fx.Provide(func() userconfig.Config {
@@ -148,11 +152,19 @@ func Module(cfg userconfig.Config) fx.Option {
 		// -- Validator
 		fx.Provide(protovalidate.New),
 
+		fx.Provide(func(cfg userconfig.Config) map[string]struct{} {
+			if len(cfg.Admin.Methods) == 0 {
+				return defaultAdminMethods
+			}
+			return cfg.Admin.Methods
+		}),
 		// -- Interceptors --
 		fx.Provide(
 			func(
 				logger *zap.Logger,
 				tokens outbound.TokenIssuer,
+				userRepo outbound.UserRepository,
+				adminMethods map[string]struct{},
 				cfg userconfig.Config,
 				redisClient *redis.Client,
 				rlCfg sharedinters.RateLimiterConfig,
@@ -163,8 +175,9 @@ func Module(cfg userconfig.Config) fx.Option {
 					sharedinters.PanicRecovery(logger),
 					sharedinters.XRequestID(),
 					sharedinters.Logger(logger),
-					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					userinters.UnaryAuth(tokens, cfg.Auth.Whitelist, cfg.Internal.Secret),
+					userinters.UnaryAdmin(userRepo, adminMethods),
+					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					sharedinters.UnaryValidation(validator),
 				}
 			},
@@ -214,7 +227,6 @@ func Module(cfg userconfig.Config) fx.Option {
 			application.NewGetPublicProfileUseCase,
 			application.NewUpdateProfileUseCase,
 			application.NewChangePasswordUseCase,
-			application.NewAdminUpdateProfileUseCase,
 			application.NewAdminResetPasswordUseCase,
 			application.NewListUsersUseCase,
 			application.NewGetUserRolesUseCase,

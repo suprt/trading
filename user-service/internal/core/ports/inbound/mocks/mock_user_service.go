@@ -70,20 +70,6 @@ func (mr *MockUserServiceMockRecorder) AdminResetPassword(ctx, in any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminResetPassword", reflect.TypeOf((*MockUserService)(nil).AdminResetPassword), ctx, in)
 }
 
-// AdminUpdateProfile mocks base method.
-func (m *MockUserService) AdminUpdateProfile(ctx context.Context, in dto.AdminUpdateProfileInput) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AdminUpdateProfile", ctx, in)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AdminUpdateProfile indicates an expected call of AdminUpdateProfile.
-func (mr *MockUserServiceMockRecorder) AdminUpdateProfile(ctx, in any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AdminUpdateProfile", reflect.TypeOf((*MockUserService)(nil).AdminUpdateProfile), ctx, in)
-}
-
 // ChangePassword mocks base method.
 func (m *MockUserService) ChangePassword(ctx context.Context, in dto.ChangePasswordInput) error {
 	m.ctrl.T.Helper()
