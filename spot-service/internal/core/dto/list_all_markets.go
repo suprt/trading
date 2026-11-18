@@ -5,7 +5,6 @@ import (
 )
 
 type ListAllMarketsInput struct {
-	CallerID        domain.UserID
 	IncludeDeleted  bool
 	IncludeDisabled bool
 }

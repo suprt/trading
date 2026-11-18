@@ -150,8 +150,8 @@ func Module(cfg orderconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					orderinters.UnaryAuth(tokens),
 					orderinters.UnaryAdmin(userClient, adminCfg),
-					sharedinters.UnaryValidation(validator),
 					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
+					sharedinters.UnaryValidation(validator),
 				}
 			},
 		),

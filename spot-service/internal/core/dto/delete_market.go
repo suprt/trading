@@ -5,6 +5,5 @@ import (
 )
 
 type DeleteMarketInput struct {
-	CallerID domain.UserID
-	ID       domain.MarketID
+	ID domain.MarketID
 }

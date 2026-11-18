@@ -38,6 +38,14 @@ import (
 	"github.com/suprt/trading/spot-service/internal/infrastructure/migrations"
 )
 
+var defaultAdminMethods = map[string]struct{}{
+	"/spot.v1.SpotInstrumentService/CreateMarket":        {},
+	"/spot.v1.SpotInstrumentService/UpdateMarketDetails": {},
+	"/spot.v1.SpotInstrumentService/UpdateMarketRoles":   {},
+	"/spot.v1.SpotInstrumentService/DeleteMarket":        {},
+	"/spot.v1.SpotInstrumentService/ListAllMarkets":      {},
+}
+
 func Module(cfg spotconfig.Config) fx.Option {
 	return fx.Module("spot",
 		fx.Provide(func() spotconfig.Config { return cfg }),
@@ -143,23 +151,31 @@ func Module(cfg spotconfig.Config) fx.Option {
 		// -- Validator
 		fx.Provide(protovalidate.New),
 
+		fx.Provide(func(cfg spotconfig.Config) map[string]struct{} {
+			if len(cfg.Admin.Methods) == 0 {
+				return defaultAdminMethods
+			}
+			return cfg.Admin.Methods
+		}),
 		// --- Interceptors ---
 		fx.Provide(
 			func(
 				logger *zap.Logger,
 				tokens outbound.TokenIssuer,
 				redisClient *redis.Client,
+				userClient outbound.UserClient,
 				rlCfg sharedinters.RateLimiterConfig,
 				errReporter outbound.ErrorReporter,
-				cfg spotconfig.Config,
 				validator protovalidate.Validator,
+				adminCfg map[string]struct{},
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
 					sharedinters.XRequestID(),
 					sharedinters.Logger(logger),
-					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					spotinters.UnaryAuth(tokens, cfg.Auth.Whitelist),
+					spotinters.UnaryAdmin(userClient, adminCfg),
+					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
 					sharedinters.UnaryValidation(validator),
 				}
 			},

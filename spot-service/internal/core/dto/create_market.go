@@ -5,7 +5,6 @@ import (
 )
 
 type CreateMarketInput struct {
-	CallerID      domain.UserID
 	Name          string
 	RequiredRoles []domain.Role
 	Enabled       bool

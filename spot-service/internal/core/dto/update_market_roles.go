@@ -5,7 +5,6 @@ import (
 )
 
 type UpdateMarketRolesInput struct {
-	CallerID      domain.UserID
 	ID            domain.MarketID
 	RequiredRoles []domain.Role
 }

@@ -26,3 +26,10 @@ rate_limiter:
     "/spot.v1.SpotInstrumentService/GetMarket":
       limit: 120
       window: 1m
+admin:
+  methods:
+    "/spot.v1.SpotInstrumentService/CreateMarket": {}
+    "/spot.v1.SpotInstrumentService/UpdateMarketDetails": {}
+    "/spot.v1.SpotInstrumentService/UpdateMarketRoles": {}
+    "/spot.v1.SpotInstrumentService/DeleteMarket": {}
+    "/spot.v1.SpotInstrumentService/ListAllMarkets": {}

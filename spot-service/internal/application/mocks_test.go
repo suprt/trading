@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/suprt/trading/spot-service/internal/core/auth"
 	"github.com/suprt/trading/spot-service/internal/core/domain"
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
 )
@@ -11,15 +12,6 @@ import (
 // ==========================================
 // MockUserClient
 // ==========================================
-
-type mockUserClient struct {
-	roles []domain.Role
-	err   error
-}
-
-func (m *mockUserClient) GetUserRoles(_ context.Context, _ domain.UserID) ([]domain.Role, int64, error) {
-	return m.roles, 1, m.err
-}
 
 // ==========================================
 // MockMarketRepo
@@ -137,4 +129,18 @@ func marketNames(markets []*domain.Market) []string {
 		names[i] = m.Name
 	}
 	return names
+}
+
+func ctxWithUser(id domain.UserID) context.Context {
+	return auth.WithUserID(context.Background(), id)
+}
+
+func ctxWithAdmin(id domain.UserID) context.Context {
+	ctx := auth.WithUserID(context.Background(), id)
+	return auth.WithIsAdmin(ctx, true)
+}
+
+func ctxWithNonAdmin(id domain.UserID) context.Context {
+	ctx := auth.WithUserID(context.Background(), id)
+	return auth.WithIsAdmin(ctx, false)
 }

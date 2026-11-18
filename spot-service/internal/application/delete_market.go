@@ -2,10 +2,9 @@ package application
 
 import (
 	"context"
-	"slices"
 	"time"
 
-	"github.com/suprt/trading/spot-service/internal/core/domain"
+	"github.com/suprt/trading/spot-service/internal/core/auth"
 	"github.com/suprt/trading/spot-service/internal/core/dto"
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
 	"github.com/suprt/trading/spot-service/internal/core/ports/outbound"
@@ -13,22 +12,15 @@ import (
 
 type DeleteMarketUseCase struct {
 	markets outbound.MarketRepository
-	users   outbound.UserClient
 	ids     outbound.IDGenerator
 }
 
-func NewDeleteMarketUseCase(m outbound.MarketRepository, u outbound.UserClient) *DeleteMarketUseCase {
-	return &DeleteMarketUseCase{markets: m, users: u}
+func NewDeleteMarketUseCase(m outbound.MarketRepository) *DeleteMarketUseCase {
+	return &DeleteMarketUseCase{markets: m}
 }
 
 func (uc *DeleteMarketUseCase) DeleteMarket(ctx context.Context, in dto.DeleteMarketInput) error {
-	roles, _, err := uc.users.GetUserRoles(ctx, in.CallerID)
-	if err != nil {
-		return err
-	}
-
-	hasAdmin := slices.Contains(roles, domain.RoleAdmin)
-	if !hasAdmin {
+	if !auth.IsAdminFromContext(ctx) {
 		return er.ErrForbidden
 	}
 

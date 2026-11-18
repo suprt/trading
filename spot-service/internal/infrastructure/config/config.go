@@ -10,14 +10,14 @@ type Config struct {
 	sharedconfig.Log
 	sharedconfig.Redis
 
-	UserService UserService
-	Internal    Internal
-	JWT         JWT
-	GRPC        GRPC
-	Postgres    Postgres
-	Cache       Cache
-	Timeouts    Timeouts
-
+	UserService              UserService
+	Internal                 Internal
+	JWT                      JWT
+	GRPC                     GRPC
+	Postgres                 Postgres
+	Cache                    Cache
+	Timeouts                 Timeouts
+	Admin                    Admin
 	sharedconfig.RateLimiter `yaml:"rate_limiter"`
 	Auth                     Auth `yaml:"auth"`
 	Seed                     Seed `yaml:"seed"`
@@ -56,7 +56,9 @@ type Cache struct {
 type Auth struct {
 	Whitelist map[string]struct{}
 }
-
+type Admin struct {
+	Methods map[string]struct{} `yaml:"methods"`
+}
 type SeedMarket struct {
 	Name          string   `yaml:"name"`
 	RequiredRoles []string `yaml:"required_roles"`

@@ -2,7 +2,6 @@ package interceptors
 
 import (
 	"context"
-	"log"
 	"slices"
 
 	"github.com/suprt/trading/order-service/internal/core/auth"
@@ -15,9 +14,6 @@ import (
 
 func UnaryAdmin(users outbound.UserClient, methods map[string]struct{}) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		if len(methods) == 0 {
-			log.Println("no methods")
-		}
 		if _, need := methods[info.FullMethod]; !need {
 			return handler(ctx, req)
 		}

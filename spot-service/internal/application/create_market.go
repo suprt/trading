@@ -2,9 +2,9 @@ package application
 
 import (
 	"context"
-	"slices"
 	"time"
 
+	"github.com/suprt/trading/spot-service/internal/core/auth"
 	"github.com/suprt/trading/spot-service/internal/core/domain"
 	"github.com/suprt/trading/spot-service/internal/core/dto"
 	er "github.com/suprt/trading/spot-service/internal/core/errors"
@@ -13,22 +13,15 @@ import (
 
 type CreateMarketUseCase struct {
 	markets outbound.MarketRepository
-	users   outbound.UserClient
 	ids     outbound.IDGenerator
 }
 
-func NewCreateMarketUseCase(m outbound.MarketRepository, u outbound.UserClient, ids outbound.IDGenerator) *CreateMarketUseCase {
-	return &CreateMarketUseCase{markets: m, users: u, ids: ids}
+func NewCreateMarketUseCase(m outbound.MarketRepository, ids outbound.IDGenerator) *CreateMarketUseCase {
+	return &CreateMarketUseCase{markets: m, ids: ids}
 }
 
 func (uc *CreateMarketUseCase) CreateMarket(ctx context.Context, in dto.CreateMarketInput) (*dto.CreateMarketOutput, error) {
-	roles, _, err := uc.users.GetUserRoles(ctx, in.CallerID)
-	if err != nil {
-		return nil, err
-	}
-
-	hasAdmin := slices.Contains(roles, domain.RoleAdmin)
-	if !hasAdmin {
+	if !auth.IsAdminFromContext(ctx) {
 		return nil, er.ErrForbidden
 	}
 
