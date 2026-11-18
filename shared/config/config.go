@@ -40,3 +40,13 @@ type RateLimiter struct {
 	Default RateLimiterRule            `yaml:"default"`
 	Methods map[string]RateLimiterRule `yaml:"methods"`
 }
+
+type CategoryLimits struct {
+	PerIPRPM  int `yaml:"per_ip_rpm"`
+	BudgetRPS int `yaml:"budget_rps"`
+}
+
+type CategoryRateLimiter struct {
+	Premium CategoryLimits `yaml:"premium"`
+	Basic   CategoryLimits `yaml:"basic"`
+}

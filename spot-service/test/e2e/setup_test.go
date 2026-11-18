@@ -144,10 +144,12 @@ func setupTestServer(t *testing.T, callerRoles []string) (spotv1.SpotInstrumentS
 				{Name: "SOL/USDT", RequiredRoles: []string{"TRADER"}, Enabled: true},
 			},
 		},
+
 		Default: sharedconfig.RateLimiterRule{
 			Limit:  100,
 			Window: time.Minute,
 		},
+
 	}
 
 	// 4. fx.App

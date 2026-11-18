@@ -16,7 +16,7 @@ func NewParser(secret []byte) *Parser {
 	return &Parser{secret: secret}
 }
 
-func (j *Parser) ParseAccess(token domain.AccessToken) (domain.UserID, error) {
+func (j *Parser) ParseAccess(token domain.AccessToken) (domain.UserID, []string, error) {
 	parsed, err := jwt.Parse(token.String(), func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -24,21 +24,28 @@ func (j *Parser) ParseAccess(token domain.AccessToken) (domain.UserID, error) {
 		return j.secret, nil
 	})
 	if err != nil {
-		return "", er.ErrInvalidToken
+		return "", nil, er.ErrInvalidToken
 	}
 	if !parsed.Valid {
-		return "", er.ErrInvalidToken
+		return "", nil, er.ErrInvalidToken
 	}
 
 	claims, ok := parsed.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", er.ErrInvalidToken
+		return "", nil, er.ErrInvalidToken
 	}
 
 	sub, _ := claims["sub"].(string)
 	if sub == "" {
-		return "", er.ErrInvalidToken
+		return "", nil, er.ErrInvalidToken
 	}
-
-	return domain.UserID(sub), nil
+	var roles []string
+	if raw, ok := claims["roles"].([]any); ok {
+		for _, r := range raw {
+			if s, ok := r.(string); ok {
+				roles = append(roles, s)
+			}
+		}
+	}
+	return domain.UserID(sub), roles, nil
 }

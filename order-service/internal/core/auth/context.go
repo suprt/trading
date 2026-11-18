@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"slices"
 
 	"github.com/suprt/trading/order-service/internal/core/domain"
 )
@@ -10,6 +11,7 @@ type ctxKey int
 
 const (
 	userIDKey ctxKey = iota
+	rolesKey
 	isAdminKey
 )
 
@@ -29,4 +31,20 @@ func WithIsAdmin(ctx context.Context, isAdmin bool) context.Context {
 func IsAdminFromContext(ctx context.Context) bool {
 	v, _ := ctx.Value(isAdminKey).(bool)
 	return v
+}
+
+func WithRoles(ctx context.Context, roles []string) context.Context {
+	return context.WithValue(ctx, rolesKey, roles)
+}
+
+func RolesFromContext(ctx context.Context) ([]string, bool) {
+	roles, ok := ctx.Value(rolesKey).([]string)
+	return roles, ok
+}
+
+func CategoryFromRoles(roles []string) string {
+	if slices.Contains(roles, "TRADER") {
+		return "premium"
+	}
+	return "basic"
 }

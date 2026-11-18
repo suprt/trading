@@ -31,6 +31,7 @@ import (
 const bufSize = 1024 * 1024
 
 // --- моки внешних сервисов ---
+const jwtSecret = "test-secret"
 
 type fakeUserClient struct {
 	roles []domain.Role
@@ -61,7 +62,7 @@ type testEnv struct {
 	cleanup func()
 }
 
-func setupTestServer(t *testing.T, userRoles []domain.Role, markets map[domain.MarketID]*domain.Market) *testEnv {
+func setupTestServer(t *testing.T, userRoles []domain.Role, markets map[domain.MarketID]*domain.Market, perIPRPM int) *testEnv {
 	t.Helper()
 	ctx := context.Background()
 
@@ -106,14 +107,14 @@ func setupTestServer(t *testing.T, userRoles []domain.Role, markets map[domain.M
 		Internal:    orderconfig.Internal{Secret: "test-internal-secret"},
 		UserService: orderconfig.UserService{Addr: "user-service:50051"},
 		SpotService: orderconfig.SpotService{Addr: "spot-service:50052"},
-		Level: "debug", Format: "console",
-		Default: sharedconfig.RateLimiterRule{Limit: 100, Window: time.Minute},
+		Level:       "debug", Format: "console",
 		Addr:        redisOpts.Addr,
 		Username:    "",
 		Password:    "",
 		DB:          0,
 		PingTimeout: 10 * time.Second,
-
+		Premium:     sharedconfig.CategoryLimits{PerIPRPM: perIPRPM, BudgetRPS: 1000},
+		Basic:       sharedconfig.CategoryLimits{PerIPRPM: perIPRPM, BudgetRPS: 1000},
 	}
 
 	users := &fakeUserClient{roles: userRoles}
@@ -170,15 +171,16 @@ func setupTestServer(t *testing.T, userRoles []domain.Role, markets map[domain.M
 		cleanup: cleanup,
 	}
 }
-
-func authCtx(t *testing.T, userID string) context.Context {
+func authCtx(t *testing.T, userID string, roles []string) context.Context {
 	t.Helper()
 	claims := jwt.MapClaims{
-		"sub": userID,
-		"exp": time.Now().Add(time.Hour).Unix(),
+		"sub":   userID,
+		"roles": roles,
+		"exp":   time.Now().Add(time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signed, err := token.SignedString([]byte("test-secret"))
+	signed, err := token.SignedString([]byte(jwtSecret))
 	require.NoError(t, err)
-	return metadata.AppendToOutgoingContext(context.Background(), "authorization", "Bearer "+signed)
+	return metadata.AppendToOutgoingContext(context.Background(), "authorization", "Bearer "+signed,
+		"x-real-ip", "127.0.0.1")
 }

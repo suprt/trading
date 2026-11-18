@@ -17,6 +17,7 @@ var (
 	marketID = domain.MarketID("00000000-0000-0000-0000-000000000001")
 	userID   = "00000000-0000-0000-0000-000000000002"
 	adminID  = "00000000-0000-0000-0000-000000000003"
+	otherID  = "00000000-0000-0000-0000-000000000004"
 )
 
 func defaultMarkets() map[domain.MarketID]*domain.Market {
@@ -24,17 +25,17 @@ func defaultMarkets() map[domain.MarketID]*domain.Market {
 		marketID: {
 			ID:            marketID,
 			Name:          "BTC/USDT",
-			RequiredRoles: nil, // доступен всем
+			RequiredRoles: nil,
 		},
 	}
 }
 
 func TestE2E_CreateOrder_Success(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
 	price := int64(60000)
-	resp, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	resp, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_LIMIT,
@@ -51,12 +52,12 @@ func TestE2E_CreateOrder_RejectedNoRole(t *testing.T) {
 	markets[marketID] = &domain.Market{
 		ID:            marketID,
 		Name:          "BTC/USDT",
-		RequiredRoles: []domain.Role{domain.RoleAdmin}, // только админ
+		RequiredRoles: []domain.Role{domain.RoleAdmin},
 	}
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, markets)
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, markets, 100)
 	defer env.cleanup()
 
-	resp, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	resp, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -67,10 +68,10 @@ func TestE2E_CreateOrder_RejectedNoRole(t *testing.T) {
 }
 
 func TestE2E_CreateOrder_MarketNotFound(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	_, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	_, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: "00000000-0000-0000-0000-000000000099",
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -81,7 +82,7 @@ func TestE2E_CreateOrder_MarketNotFound(t *testing.T) {
 }
 
 func TestE2E_CreateOrder_Unauthenticated(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
 	_, err := env.client.CreateOrder(context.Background(), &orderv1.CreateOrderRequest{
@@ -95,10 +96,10 @@ func TestE2E_CreateOrder_Unauthenticated(t *testing.T) {
 }
 
 func TestE2E_CreateThenCancel(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	ctx := authCtx(t, userID)
+	ctx := authCtx(t, userID, []string{"USER"})
 	created, err := env.client.CreateOrder(ctx, &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
@@ -114,7 +115,6 @@ func TestE2E_CreateThenCancel(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, orderv1.OrderStatus_ORDER_STATUS_CANCELLED, cancelled.Order.Status)
 
-	// повторная отмена — FailedPrecondition
 	_, err = env.client.CancelOrder(ctx, &orderv1.CancelOrderRequest{
 		OrderId: created.Order.Id,
 	})
@@ -123,10 +123,10 @@ func TestE2E_CreateThenCancel(t *testing.T) {
 }
 
 func TestE2E_CancelOrder_Forbidden(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	created, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	created, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -134,8 +134,7 @@ func TestE2E_CancelOrder_Forbidden(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	other := "00000000-0000-0000-0000-000000000004"
-	_, err = env.client.CancelOrder(authCtx(t, other), &orderv1.CancelOrderRequest{
+	_, err = env.client.CancelOrder(authCtx(t, otherID, []string{"USER"}), &orderv1.CancelOrderRequest{
 		OrderId: created.Order.Id,
 	})
 	require.Error(t, err)
@@ -143,10 +142,10 @@ func TestE2E_CancelOrder_Forbidden(t *testing.T) {
 }
 
 func TestE2E_GetOrder_Forbidden(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	created, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	created, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -154,8 +153,7 @@ func TestE2E_GetOrder_Forbidden(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	other := "00000000-0000-0000-0000-000000000004"
-	_, err = env.client.GetOrder(authCtx(t, other), &orderv1.GetOrderRequest{
+	_, err = env.client.GetOrder(authCtx(t, otherID, []string{"USER"}), &orderv1.GetOrderRequest{
 		OrderId: created.Order.Id,
 	})
 	require.Error(t, err)
@@ -163,10 +161,10 @@ func TestE2E_GetOrder_Forbidden(t *testing.T) {
 }
 
 func TestE2E_ListOrders(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	ctx := authCtx(t, userID)
+	ctx := authCtx(t, userID, []string{"USER"})
 	for i := 0; i < 3; i++ {
 		_, err := env.client.CreateOrder(ctx, &orderv1.CreateOrderRequest{
 			MarketId: string(marketID),
@@ -183,10 +181,10 @@ func TestE2E_ListOrders(t *testing.T) {
 }
 
 func TestE2E_ListOrders_InvalidPageToken(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	_, err := env.client.ListOrders(authCtx(t, userID), &orderv1.ListOrdersRequest{
+	_, err := env.client.ListOrders(authCtx(t, userID, []string{"USER"}), &orderv1.ListOrdersRequest{
 		PageSize:  10,
 		PageToken: "not-base64!!!",
 	})
@@ -195,12 +193,11 @@ func TestE2E_ListOrders_InvalidPageToken(t *testing.T) {
 }
 
 func TestE2E_ListOrders_AdminFilterByUser(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleAdmin}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	// user создаёт 2 заказа
 	for i := 0; i < 2; i++ {
-		_, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+		_, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 			MarketId: string(marketID),
 			Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 			Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -209,9 +206,8 @@ func TestE2E_ListOrders_AdminFilterByUser(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	// админ видит только заказы userID
 	uid := userID
-	out, err := env.client.ListOrders(authCtx(t, adminID), &orderv1.ListOrdersRequest{
+	out, err := env.client.ListOrders(authCtx(t, adminID, []string{"ADMIN"}), &orderv1.ListOrdersRequest{
 		UserId:   &uid,
 		PageSize: 10,
 	})
@@ -223,11 +219,10 @@ func TestE2E_ListOrders_AdminFilterByUser(t *testing.T) {
 }
 
 func TestE2E_GetOrder_AdminCanSeeOthers(t *testing.T) {
-	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets())
+	env := setupTestServer(t, []domain.Role{domain.RoleUser, domain.RoleAdmin}, defaultMarkets(), 100)
 	defer env.cleanup()
 
-	// user создаёт заказ
-	created, err := env.client.CreateOrder(authCtx(t, userID), &orderv1.CreateOrderRequest{
+	created, err := env.client.CreateOrder(authCtx(t, userID, []string{"USER"}), &orderv1.CreateOrderRequest{
 		MarketId: string(marketID),
 		Side:     orderv1.OrderSide_ORDER_SIDE_BUY,
 		Type:     orderv1.OrderType_ORDER_TYPE_MARKET,
@@ -235,10 +230,44 @@ func TestE2E_GetOrder_AdminCanSeeOthers(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	// админ видит чужой заказ
-	got, err := env.client.GetOrder(authCtx(t, adminID), &orderv1.GetOrderRequest{
+	got, err := env.client.GetOrder(authCtx(t, adminID, []string{"ADMIN"}), &orderv1.GetOrderRequest{
 		OrderId: created.Order.Id,
 	})
 	require.NoError(t, err)
 	require.Equal(t, created.Order.Id, got.Order.Id)
+}
+
+func TestE2E_RateLimit_Basic(t *testing.T) {
+	env := setupTestServer(t, []domain.Role{domain.RoleUser}, defaultMarkets(), 2) // perIPRPM=2
+	defer env.cleanup()
+
+	ctx := authCtx(t, userID, []string{"USER"})
+
+	for i := 0; i < 2; i++ {
+		_, err := env.client.GetOrder(ctx, &orderv1.GetOrderRequest{
+			OrderId: "00000000-0000-0000-0000-000000000099",
+		})
+		require.NotEqual(t, codes.ResourceExhausted, status.Code(err))
+	}
+
+	_, err := env.client.GetOrder(ctx, &orderv1.GetOrderRequest{
+		OrderId: "00000000-0000-0000-0000-000000000099",
+	})
+	require.Error(t, err)
+	require.Equal(t, codes.ResourceExhausted, status.Code(err))
+	require.Equal(t, "too many requests", status.Convert(err).Message())
+}
+
+func TestE2E_RateLimit_AdminSkip(t *testing.T) {
+	env := setupTestServer(t, []domain.Role{domain.RoleAdmin}, defaultMarkets(), 2) // perIPRPM=2, но admin skip
+	defer env.cleanup()
+
+	ctx := authCtx(t, adminID, []string{"ADMIN"})
+
+	for i := 0; i < 10; i++ {
+		_, err := env.client.GetOrder(ctx, &orderv1.GetOrderRequest{
+			OrderId: "00000000-0000-0000-0000-000000000099",
+		})
+		require.NotEqual(t, codes.ResourceExhausted, status.Code(err))
+	}
 }

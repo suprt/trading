@@ -43,15 +43,15 @@ type Timeouts struct {
 type Config struct {
 	sharedconfig.Log
 	sharedconfig.Redis
-	GRPC                     GRPC
-	Postgres                 Postgres
-	JWT                      JWT
-	Internal                 Internal
-	UserService              UserService
-	SpotService              SpotService
-	Timeouts                 Timeouts
-	Admin                    Admin
-	sharedconfig.RateLimiter `yaml:"rate_limiter"`
+	GRPC                             GRPC
+	Postgres                         Postgres
+	JWT                              JWT
+	Internal                         Internal
+	UserService                      UserService
+	SpotService                      SpotService
+	Timeouts                         Timeouts
+	Admin                            Admin
+	sharedconfig.CategoryRateLimiter `yaml:"rate_limiter"`
 }
 
 type Admin struct {

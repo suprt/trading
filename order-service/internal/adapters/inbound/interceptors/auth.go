@@ -37,13 +37,13 @@ func UnaryAuth(tokens outbound.TokenIssuer) grpc.UnaryServerInterceptor {
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header")
 		}
 
-		userID, err := tokens.ParseAccess(domain.AccessToken(raw))
+		userID, roles, err := tokens.ParseAccess(domain.AccessToken(raw))
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid token")
 		}
 
 		ctx = auth.WithUserID(ctx, userID)
-
+		ctx = auth.WithRoles(ctx, roles)
 		return handler(ctx, req)
 	}
 }

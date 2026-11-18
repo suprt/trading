@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -22,7 +23,7 @@ func (j *Parser) ParseAccess(token domain.AccessToken) (domain.UserID, []domain.
 			return nil, errors.New("unexpected signing method")
 		}
 		return j.secret, nil
-	})
+	}, jwt.WithJSONNumber())
 	if err != nil {
 		return "", nil, 0, er.ErrInvalidToken
 	}
@@ -41,10 +42,11 @@ func (j *Parser) ParseAccess(token domain.AccessToken) (domain.UserID, []domain.
 	}
 
 	var rv int64
-	if v, ok := claims["rv"].(int64); ok {
-		rv = v
+	if num, ok := claims["rv"].(json.Number); ok {
+		if v, err := num.Int64(); err == nil {
+			rv = v
+		}
 	}
-
 	var roles []domain.Role
 	if raw, ok := claims["roles"].([]any); ok {
 		for _, r := range raw {

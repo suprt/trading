@@ -24,7 +24,7 @@ type SpotClient interface {
 }
 
 type TokenIssuer interface {
-	ParseAccess(token domain.AccessToken) (domain.UserID, error)
+	ParseAccess(token domain.AccessToken) (domain.UserID, []string, error)
 }
 
 type IDGenerator interface {

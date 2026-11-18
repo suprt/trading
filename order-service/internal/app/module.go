@@ -102,26 +102,22 @@ func Module(cfg orderconfig.Config) fx.Option {
 			orderjwt.NewParser,
 			fx.Annotate(orderjwt.NewParser, fx.As(new(outbound.TokenIssuer))),
 		),
+		// AuthInfo
+		fx.Provide(func() sharedinters.AuthInfo { return orderinters.NewAuthInfo() }),
 
 		// --- RateLimiter config ---
-		fx.Provide(
-			func(cfg orderconfig.Config) sharedinters.RateLimiterConfig {
-				methods := make(map[string]sharedconfig.RateLimiterRule, len(cfg.RateLimiter.Methods))
-				for k, v := range cfg.RateLimiter.Methods {
-					methods[k] = sharedconfig.RateLimiterRule{
-						Limit:  v.Limit,
-						Window: v.Window,
-					}
-				}
-				return sharedinters.RateLimiterConfig{
-					Default: sharedconfig.RateLimiterRule{
-						Limit:  cfg.RateLimiter.Default.Limit,
-						Window: cfg.RateLimiter.Default.Window,
-					},
-					Methods: methods,
-				}
-			},
-		),
+		fx.Provide(func(cfg orderconfig.Config) sharedinters.CategoryRateLimiterConfig {
+			return sharedinters.CategoryRateLimiterConfig{
+				Premium: sharedconfig.CategoryLimits{
+					PerIPRPM:  cfg.Premium.PerIPRPM,
+					BudgetRPS: cfg.Premium.BudgetRPS,
+				},
+				Basic: sharedconfig.CategoryLimits{
+					PerIPRPM:  cfg.Basic.PerIPRPM,
+					BudgetRPS: cfg.Basic.BudgetRPS,
+				},
+			}
+		}),
 		// -- Validator
 		fx.Provide(protovalidate.New),
 
@@ -139,10 +135,11 @@ func Module(cfg orderconfig.Config) fx.Option {
 				tokens outbound.TokenIssuer,
 				redisClient *redis.Client,
 				userClient outbound.UserClient,
-				rlCfg sharedinters.RateLimiterConfig,
+				rlCfg sharedinters.CategoryRateLimiterConfig,
 				errReporter outbound.ErrorReporter,
 				validator protovalidate.Validator,
 				adminCfg map[string]struct{},
+				authInfo sharedinters.AuthInfo,
 			) []grpc.UnaryServerInterceptor {
 				return []grpc.UnaryServerInterceptor{
 					sharedinters.PanicRecovery(logger),
@@ -150,7 +147,7 @@ func Module(cfg orderconfig.Config) fx.Option {
 					sharedinters.Logger(logger),
 					orderinters.UnaryAuth(tokens),
 					orderinters.UnaryAdmin(userClient, adminCfg),
-					sharedinters.UnaryRateLimiter(redisClient, rlCfg, errReporter),
+					sharedinters.UnaryCategoryRateLimiter(redisClient, rlCfg, authInfo, errReporter),
 					sharedinters.UnaryValidation(validator),
 				}
 			},
