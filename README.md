@@ -13,8 +13,11 @@
 
 - **Postgres** — 3 инстанса (по одному на сервис)
 - **Redis** — rate limiting, кэш
-- **Prometheus, Jaeger** — мониторинг (в планах)
+- Prometheus (в планах)
+- **Tempo, Grafana** — мониторинг 
 
+Grafana расположена по адресу localhost:3000. На данный момент дэшборды отсутствуют, только просмотр трейсов через Explore.
+Есть трейсинг postgresql и redis запросов.
 ## Быстрый старт
 
 ```bash

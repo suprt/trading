@@ -16,6 +16,7 @@ import (
 	sharedinters "github.com/suprt/trading/shared/interceptors"
 	"github.com/suprt/trading/shared/logger"
 	shareredis "github.com/suprt/trading/shared/redis"
+	sharedtracing "github.com/suprt/trading/shared/tracing"
 	"github.com/suprt/trading/shared/zaperror"
 	grpchand "github.com/suprt/trading/user-service/internal/adapters/inbound/grpc"
 	userinters "github.com/suprt/trading/user-service/internal/adapters/inbound/interceptors"
@@ -92,6 +93,23 @@ func Module(cfg userconfig.Config) fx.Option {
 		fx.Provide(func(r *zaperror.Reporter) sharedinters.ErrorReporter { return r }),
 		fx.Provide(func(r *zaperror.Reporter) shareredis.ErrorReporter { return r }),
 		fx.Provide(func(r *zaperror.Reporter) db.ErrorReporter { return r }),
+
+		// --- Tracing ---
+		fx.Invoke(func(lc fx.Lifecycle, cfg userconfig.Config) error {
+			ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeouts.TracingInit)
+			defer cancel()
+
+			shutdown, err := sharedtracing.Init(ctx, cfg.Tracing)
+			if err != nil {
+				return err
+			}
+			lc.Append(fx.Hook{
+				OnStop: func(ctx context.Context) error {
+					return shutdown(ctx)
+				},
+			})
+			return nil
+		}),
 
 		// -- Миграции --
 		fx.Invoke(func(lc fx.Lifecycle, cfg userconfig.Config) {

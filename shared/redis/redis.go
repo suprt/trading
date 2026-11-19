@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/suprt/trading/shared/config"
 )
@@ -22,6 +23,9 @@ func NewClient(cfg Config, reporter ErrorReporter) (*redis.Client, error) {
 		DB:       cfg.DB,
 	})
 
+	if err := redisotel.InstrumentTracing(client, redisotel.WithDBStatement(false)); err != nil {
+		return nil, err
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.PingTimeout)
 	defer cancel()
 

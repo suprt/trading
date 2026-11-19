@@ -32,6 +32,7 @@ type Config struct {
 	sharedconfig.Log
 	sharedconfig.JWTSecret
 	sharedconfig.Redis
+	sharedconfig.Tracing
 	GRPC                     GRPC
 	Postgres                 Postgres
 	JWT                      JWT
@@ -50,6 +51,7 @@ type Config struct {
 type Timeouts struct {
 	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
 	SessionCleanup  time.Duration `env:"TIMEOUT_SESSION_CLEANUP"  envDefault:"30s"`
+	TracingInit     time.Duration `env:"TIMEOUT_TRACING_INIT" envDefault:"10s"`
 }
 type Sessions struct {
 	CleanupEnabled  bool          `env:"SESSIONS_CLEANUP_ENABLED"  envDefault:"true"`

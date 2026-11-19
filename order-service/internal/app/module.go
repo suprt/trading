@@ -8,15 +8,8 @@ import (
 	"buf.build/go/protovalidate"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
-	orderinters "github.com/suprt/trading/order-service/internal/adapters/inbound/interceptors"
-	sharedconfig "github.com/suprt/trading/shared/config"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-
 	grpchand "github.com/suprt/trading/order-service/internal/adapters/inbound/grpc"
+	orderinters "github.com/suprt/trading/order-service/internal/adapters/inbound/interceptors"
 	orderjwt "github.com/suprt/trading/order-service/internal/adapters/outbound/jwt"
 	"github.com/suprt/trading/order-service/internal/adapters/outbound/postgres"
 	"github.com/suprt/trading/order-service/internal/adapters/outbound/spotclient"
@@ -30,12 +23,20 @@ import (
 	spotv1 "github.com/suprt/trading/proto/spot/v1"
 	userv1 "github.com/suprt/trading/proto/user/v1"
 	"github.com/suprt/trading/shared/bootstrap"
+	sharedconfig "github.com/suprt/trading/shared/config"
 	"github.com/suprt/trading/shared/db"
 	"github.com/suprt/trading/shared/idgen"
 	sharedinters "github.com/suprt/trading/shared/interceptors"
 	"github.com/suprt/trading/shared/logger"
 	shareredis "github.com/suprt/trading/shared/redis"
+	sharedtracing "github.com/suprt/trading/shared/tracing"
 	"github.com/suprt/trading/shared/zaperror"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 )
 
 var defaultAdminMethods = map[string]struct{}{
@@ -85,6 +86,22 @@ func Module(cfg orderconfig.Config) fx.Option {
 			shareredis.NewClient,
 		),
 
+		// --- Tracing ---
+		fx.Invoke(func(lc fx.Lifecycle, cfg orderconfig.Config) error {
+			ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeouts.TracingInit)
+			defer cancel()
+
+			shutdown, err := sharedtracing.Init(ctx, cfg.Tracing)
+			if err != nil {
+				return err
+			}
+			lc.Append(fx.Hook{
+				OnStop: func(ctx context.Context) error {
+					return shutdown(ctx)
+				},
+			})
+			return nil
+		}),
 		// --- Миграции ---
 		fx.Invoke(func(lc fx.Lifecycle, cfg orderconfig.Config) {
 			lc.Append(fx.Hook{
@@ -159,6 +176,7 @@ func Module(cfg orderconfig.Config) fx.Option {
 				conn, err := grpc.NewClient(
 					cfg.UserService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
+					grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
 				)
 				if err != nil {
 					return nil, err
@@ -169,6 +187,7 @@ func Module(cfg orderconfig.Config) fx.Option {
 				conn, err := grpc.NewClient(
 					cfg.SpotService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
+					grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
 				)
 				if err != nil {
 					return nil, err

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -26,7 +27,9 @@ type Result struct {
 
 func New(p Params) Result {
 	srv := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(p.Interceptors...))
+		grpc.ChainUnaryInterceptor(p.Interceptors...),
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	)
 
 	p.LC.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

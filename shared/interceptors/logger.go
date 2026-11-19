@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,7 +21,12 @@ func Logger(logger *zap.Logger) grpc.UnaryServerInterceptor {
 			zap.String("method", info.FullMethod),
 			zap.Duration("duration", duration),
 		}
-
+		if sc := trace.SpanContextFromContext(ctx); sc.IsValid() {
+			fields = append(fields,
+				zap.String("trace_id", sc.TraceID().String()),
+				zap.String("span_id", sc.SpanID().String()),
+			)
+		}
 		if id, ok := RequestIDFromContext(ctx); ok {
 			fields = append(fields, zap.String("request_id", id))
 		}

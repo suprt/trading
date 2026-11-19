@@ -11,9 +11,11 @@ import (
 	"github.com/suprt/trading/shared/bootstrap"
 	sharedconfig "github.com/suprt/trading/shared/config"
 	"github.com/suprt/trading/shared/logger"
+	sharedtracing "github.com/suprt/trading/shared/tracing"
 	"github.com/suprt/trading/shared/zaperror"
 	"github.com/suprt/trading/spot-service/internal/adapters/outbound/cached"
 	"github.com/suprt/trading/spot-service/internal/adapters/outbound/rediscache"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -92,6 +94,23 @@ func Module(cfg spotconfig.Config) fx.Option {
 			},
 		),
 
+		// --- Tracing ---
+		fx.Invoke(func(lc fx.Lifecycle, cfg spotconfig.Config) error {
+			ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeouts.TracingInit)
+			defer cancel()
+
+			shutdown, err := sharedtracing.Init(ctx, cfg.Tracing)
+			if err != nil {
+				return err
+			}
+			lc.Append(fx.Hook{
+				OnStop: func(ctx context.Context) error {
+					return shutdown(ctx)
+				},
+			})
+			return nil
+		}),
+
 		// --- Миграции ---
 		fx.Invoke(func(lc fx.Lifecycle, cfg spotconfig.Config) {
 			lc.Append(fx.Hook{
@@ -107,6 +126,7 @@ func Module(cfg spotconfig.Config) fx.Option {
 				conn, err := grpc.NewClient(
 					cfg.UserService.Addr,
 					grpc.WithTransportCredentials(insecure.NewCredentials()),
+					grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
 				)
 				if err != nil {
 					return nil, err //TODO: обработать и вернуть ошибку

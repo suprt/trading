@@ -9,11 +9,6 @@ type Log struct {
 	SamplingThereafter int    `env:"LOG_SAMPLING_THEREAFTER" envDefault:"100"`
 }
 
-type Tracing struct {
-	Enabled  bool   `env:"TRACE_ENABLED" envDefault:"false"`
-	Endpoint string `env:"TRACE_ENDPOINT" envDefault:"127.0.0.1:6831"`
-}
-
 type Metrics struct {
 	Enabled bool   `env:"METRICS_ENABLED" envDefault:"false"`
 	Addr    string `env:"METRICS_ADDR" envDefault:":9090"`
@@ -49,4 +44,11 @@ type CategoryLimits struct {
 type CategoryRateLimiter struct {
 	Premium CategoryLimits `yaml:"premium"`
 	Basic   CategoryLimits `yaml:"basic"`
+}
+
+type Tracing struct {
+	Enabled     bool    `env:"TRACING_ENABLED" envDefault:"false"`
+	Endpoint    string  `env:"TRACING_ENDPOINT" envDefault:"otel-collector:4317"`
+	ServiceName string  `env:"TRACING_SERVICE_NAME"`
+	SampleRate  float64 `env:"TRACING_SAMPLE_RATE" envDefault:"1.0"`
 }

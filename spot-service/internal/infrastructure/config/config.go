@@ -9,6 +9,7 @@ import (
 type Config struct {
 	sharedconfig.Log
 	sharedconfig.Redis
+	sharedconfig.Tracing
 
 	UserService              UserService
 	Internal                 Internal
@@ -25,6 +26,7 @@ type Config struct {
 
 type Timeouts struct {
 	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
+	TracingInit     time.Duration `env:"TIMEOUT_TRACING_INIT" envDefault:"10s"`
 }
 type UserService struct {
 	Addr string `env:"USER_SERVICE_ADDR" envDefault:"user-service:50051"`

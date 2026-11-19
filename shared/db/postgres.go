@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -26,6 +27,7 @@ func NewPostgres(cfg Config) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, err
 	}
+	poolCfg.ConnConfig.Tracer = otelpgx.NewTracer()
 	poolCfg.MaxConns = cfg.MaxConns
 	poolCfg.MinConns = cfg.MinConns
 	poolCfg.MaxConnLifetime = cfg.MaxConnLifetime

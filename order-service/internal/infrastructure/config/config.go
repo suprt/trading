@@ -38,6 +38,7 @@ type SpotService struct {
 
 type Timeouts struct {
 	PostgresConnect time.Duration `env:"TIMEOUT_POSTGRES_CONNECT" envDefault:"10s"`
+	TracingInit     time.Duration `env:"TIMEOUT_TRACING_INIT" envDefault:"10s"`
 }
 
 type Config struct {
@@ -52,6 +53,7 @@ type Config struct {
 	Timeouts                         Timeouts
 	Admin                            Admin
 	sharedconfig.CategoryRateLimiter `yaml:"rate_limiter"`
+	sharedconfig.Tracing
 }
 
 type Admin struct {
