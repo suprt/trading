@@ -17,7 +17,6 @@ import (
 )
 
 func Init(ctx context.Context, cfg sharedconfig.Tracing) (func(context.Context) error, error) {
-	// propagation ставим всегда — trace context пробрасывается даже без экспорта
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{},
 		propagation.Baggage{},
